@@ -67,30 +67,6 @@ LOGFILE="$(mktemp)"
 panvimdoc () {
 	< "${SOURCE}" \
 	gawk '{ 
-		# parse ignore
-		if ($0 ~ "ignore-line") { 
-			getline
-			getline
-		}
-		if ($0 ~ "ignore-start") {
-			ignore="Yes" 
-		}
-		if (ignore && $0 ~ "ignore-end") {
-			ignore=Null; getline 
-		}
-
-		# parse doc-tags
-		if ($2 ~ "doc=.+") {
-			doc=$2
-			getline 
-			$(NF + 1)="{"doc"}"
-		}
-
-		# parse optional args
-		if ($0 ~ "{.+?}") {
-			gsub("?}", "*}", $0)
-		}
-
 		# parse header blocks
 		if ($1 == "#####" && $(NF) ~ ":$" ) {
 			$(NF + 1)="~"
@@ -104,9 +80,11 @@ panvimdoc () {
 			code=Null
 		}
 
-		if (! code && $0 ~ "[^`]<[^>]+>") gsub("<[^>]+>", "", $0)
+		if (! code && $0 ~ "[^`]<[^>]+>")
+			gsub("<[^>]+>", "", $0)
 
-		if (! ignore) print $0 
+
+		print $0 
 	}' |
 	pandoc \
 		-M 'project:hibiscus' -M 'description:Opinionated fennel macros for neovim' \
@@ -124,4 +102,3 @@ else
 	logcat "${LOGFILE}"
 	exit 1
 fi
-
