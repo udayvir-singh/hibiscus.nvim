@@ -107,12 +107,16 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 
 - For Fennel Functions:
 ```clojure
+(map! [nv :expr] :j
+      '(if (> vim.v.count 0) "j" "gj"))
+
 (fn greet []
   (print "Hello World!"))
 
-(map! [nx] :lhs 'greet) ; variables need to be quoted to indicate they are function
+(map! [n] :lhs 'greet) ; variables need to be quoted to indicate they are function
 
-(map! [nv] :lhs #(print "inline functions don't require quoting"))
+(map! [n] :lhs #(print "inline functions don't require quoting"))
+
 ```
 
 ## autocmds
