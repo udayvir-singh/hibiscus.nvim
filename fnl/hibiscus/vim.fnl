@@ -86,17 +86,18 @@
   (string.gsub "func_xxxxxxxx" "x"
                #(string.format "%x" (math.random 16))))
 
-(lambda vlua [func args]
+(lambda vlua [func args ?expr]
   "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
-  (local id (gen-id))
+  (local id   (gen-id))
+  (local call (if ?expr "v:lua." ":lua "))
   (values
     (list `tset `_G.hibiscus.store id func)
-    (fstring ":lua _G.hibiscus.store.${id} ${args}")))
+    (fstring "${call}_G.hibiscus.store.${id}${args}")))
 
-(lambda parse-cmd [xs fnarg]
+(lambda parse-cmd [xs ...]
   "parses command 'xs', wrapping it with vlua if required."
-  (if (func?  xs) (vlua xs fnarg)
-      (quote? xs) (vlua (unquote- xs) fnarg)
+  (if (func?  xs) (vlua ...)
+      (quote? xs) (vlua (unquote- xs) ...)
       :else
       (values nil xs)))
 
@@ -126,7 +127,7 @@
 (lmd map! [args lhs rhs]
   "defines vim keymap for modes in 'args'."
   (local out [])
-  (let [(pre cmd) (parse-cmd rhs "()<CR>")
+  (let [(pre cmd) (if (vim.tbl_contains args :expr) (parse-cmd rhs "()" true) (parse-cmd rhs "()<CR>"))
         args      (parse-map-args args)]
     (table.insert out pre)
     :mapping
