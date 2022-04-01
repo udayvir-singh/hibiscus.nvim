@@ -13,7 +13,7 @@
 
 (lambda set- [name val]
   "sets variable 'name' to 'val' and returns its value."
-  `(do (set ,name ,val)
+  `(do (set-forcibly! ,name ,val)
        :return ,name))
 
 (lambda tset- [tbl key val]
