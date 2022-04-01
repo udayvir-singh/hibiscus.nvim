@@ -104,7 +104,7 @@ panvimdoc () {
 			code=Null
 		}
 
-		if (! code) gsub("<[^>]+>", "", $0)
+		if (! code && $0 ~ "[^`]<[^>]+>") gsub("<[^>]+>", "", $0)
 
 		if (! ignore) print $0 
 	}' |

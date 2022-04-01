@@ -142,16 +142,16 @@
 ;; -------------------- ;;
 ;;       AUTOCMDS       ;;
 ;; -------------------- ;;
-(lambda parse-autocmd [[group pattern cmd]]
+(lambda parse-autocmd [[groups pattern cmd]]
   "converts given args into valid autocmd command."
-  (let [groups    (table.concat (vim.tbl_map tostring group) ",")
+  (let [groups    (table.concat (vim.tbl_map tostring groups) ",")
         pattern   (parse-sym pattern)
         (pre cmd) (parse-cmd cmd "()")]
     :return
     (values pre [:au groups pattern cmd])))
 
 (lmd augroup! [name ...]
-  "defines augroup with 'name' and {...} containing [[group] pat cmd] chunks."
+  "defines augroup with 'name' and {...} containing [[groups] pat cmd] chunks."
   (local setup [])
   (local cmds [
     [:augroup name]
@@ -175,7 +175,7 @@
 (local cmd-opts 
   "{
      bang  = ('<bang>' == '!'),
-     line  = {<line1>, <line2>},
+     lines = {<line1>, <line2>},
      count = <count>,
      qargs = <q-args>
   }"
@@ -199,8 +199,8 @@
   :return out)
 
 (lmd command! [args lhs rhs]
-  "defines a user command with 'lhs' and 'rhs'."
-  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n" ""))
+  "defines a user command from 'lhs' and 'rhs'."
+  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n +" " "))
         options   (parse-command-args args)]
     :return
     `(do ,pre ,(exec [[:command! options lhs cmd]]))))
@@ -235,9 +235,9 @@
   "removes 'val' from vim option 'name'."
   `(: (. vim.opt ,(parse-sym name)) :remove ,val))
 
-(lmd color! [val]
-  "sets vim colorscheme to 'val'."
-  (exec [[:colorscheme val]]))
+(lmd color! [name]
+  "sets vim colorscheme to 'name'."
+  (exec [[:colorscheme name]]))
 
 
 ;; -------------------- ;;
