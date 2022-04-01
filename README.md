@@ -52,7 +52,7 @@ require [[hibiscus]].setup()
 (import-macros {: map!}     :hibiscus.vim)
 ```
 
- DONE: now start using these macros in your config
+DONE: now start using these macros in your config
 
 ---
 
@@ -85,29 +85,29 @@ Add these lines of top of your modules:
 
 ## keymaps
 #### map!
-<pre lang="fennel"><code>(map! {args} {lhs} {rhs})
+<pre lang="clojure"><code>(map! {args} {lhs} {rhs})
 </pre></code>
 
 Defines vim keymap for the given modes from {lhs} to {rhs}
 
 ##### Arguments:
 {args} can contain the following values:
-```fennel
-; modes |                   options                           |
+```clojure
+; modes |                   options                          |
 [ nivcx  :buffer :remap :silent :nowait :expr :unique :script ]
 ```
 
 ##### Examples:
 - For Vimscript:
-```fennel
+```clojure
 (map! [n :buffer] :R "echo &rtp")
 
 (let [rhs ":echo hello"]
-  (map! [nv] :lhs rhs))
+  (map! [nv :nowait] :lhs rhs))
 ```
 
 - For Fennel Functions:
-```fennel
+```clojure
 (fn greet []
   (print "Hello World!"))
 
@@ -118,14 +118,14 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 
 ## autocmds
 #### augroup!
-<pre lang="fennel"><code>(augroup! {name} {cmds})
+<pre lang="clojure"><code>(augroup! {name} {cmds})
 </pre></code>
 
 Defines autocmd group of {name} with {cmds} containing [groups pattern cmd] chunks.
 
 ##### Examples:
 - For Vimscript:
-```fennel
+```clojure
 (local clj "clojure")
 
 (augroup! :greet
@@ -134,7 +134,7 @@ Defines autocmd group of {name} with {cmds} containing [groups pattern cmd] chun
 ```
 
 - For Fennel Functions:
-```fennel
+```clojure
 (fn hello [] (print :hello))
 
 (augroup! :greet
@@ -144,7 +144,7 @@ Defines autocmd group of {name} with {cmds} containing [groups pattern cmd] chun
 
 ## commands
 #### command!
-<pre lang="fennel"><code>(command! {args} {lhs} {rhs})
+<pre lang="clojure"><code>(command! {args} {lhs} {rhs})
 </pre></code>
 
 Defines user command {lhs} to {rhs}
@@ -176,7 +176,7 @@ Defines user command {lhs} to {rhs}
 }
 ```
 They are passed as first argument to lua function, For example:
-```fennel
+```clojure
 (fn example [opts]
   (print opts.qargs))
 
@@ -185,16 +185,16 @@ They are passed as first argument to lua function, For example:
 
 ##### Examples:
 - For Vimscript:
-```fennel
-(command! [:nargs "1"] :Lhs "echo 'hello ' . <q-args>")
+```clojure
+(command! [:nargs 1] :Lhs "echo 'hello ' . <q-args>")
 ```
 
 - For Fennel Functions:
-```fennel
+```clojure
 (fn greet [opts]
   (print :hello opts.qargs))
 
-(command! [:nargs "1"] :Lhs 'greet) ; again remember to quote 
+(command! [:nargs 1] :Lhs 'greet) ; again remember to quote 
 
 (command! [:bang true] :Lhs '(print opts.bang))
 ; or
@@ -204,7 +204,7 @@ They are passed as first argument to lua function, For example:
 ## vim options
 #### set!
 Works like command `:set`, sets vim option {name} to {val}
-```fennel
+```clojure
 (set! nobackup)
 (set! tabstop 4)
 
@@ -215,27 +215,27 @@ Works like command `:set`, sets vim option {name} to {val}
 #### set+
 Appends {val} to string-style option {name}
 
-```fennel
+```clojure
 (set+ wildignore "*.foo")
 ```
 
 #### set^
 Prepends {val} to string-style option {name}
-```fennel
+```clojure
 (set^ wildignore ["*.foo" "*.baz"])
 ```
 
 #### rem!
 Removes {val} from string-style option {name}
 
-```fennel
+```clojure
 (rem! wildignore "*.baz")
 ```
 
 #### color!
 Sets vim colorscheme to {name}
 
-```fennel
+```clojure
 (color! "desert")
 ```
 
@@ -243,14 +243,14 @@ Sets vim colorscheme to {name}
 #### g!
 Sets global variable {name} to {val}.
 
-```fennel
+```clojure
 (g! mapleader " ")
 ```
 
 #### b!
 Sets buffer scoped variable {name} to {val}.
 
-```fennel
+```clojure
 (b! gretting "Hello World!")
 ```
 
