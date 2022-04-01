@@ -71,14 +71,14 @@
   "checks if 'x' is of table type."
   `(= :table (type ,x)))
 
+(fun list? [tbl]
+  "checks if 'tbl' is a valid list."
+  `(vim.tbl_islist ,tbl))
+
 (fun empty? [tbl]
   "checks if 'tbl' is empty."
   `(and ,(table? tbl)
         (= 0 (length ,tbl))))
-
-(fun list? [tbl]
-  "checks if 'tbl' is a valid list."
-  `(vim.tbl_islist ,tbl))
 
 
 ;; -------------------- ;;
@@ -109,7 +109,7 @@
   (set- v (list `.. v str)))
 
 (lmd tappend [tbl key str]
-  "appends 'str' in 'key' of table 'tbl'."
+  "appends 'str' to 'key' of table 'tbl'."
   (tset- tbl key `(.. (or (. ,tbl ,key) "") ,str)))
 
 (lmd prepend [v str]
@@ -117,7 +117,7 @@
   (set- v (list `.. str v)))
 
 (lmd tprepend [tbl key str]
-  "prepends 'str' in 'key' of table 'tbl'."
+  "prepends 'str' to 'key' of table 'tbl'."
   (tset- tbl key `(.. ,str (or (. ,tbl ,key) ""))))
 
 (lmd fstring [str]

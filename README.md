@@ -43,13 +43,13 @@ require [[hibiscus]].setup()
 
 3. Require a macro library at top of your modules:
 ```fennel
-;; require all macros
+; require all macros
 (require-macros :hibiscus.core)
 (require-macros :hibiscus.vim)
 
-;; require selected macros
-(import-macros {:fstring f} :hibiscus.core)
-(import-macros {: map!}     :hibiscus.vim)
+; require selected macros
+(import-macros {: fstring} :hibiscus.core)
+(import-macros {: map!}    :hibiscus.vim)
 ```
 
 DONE: now start using these macros in your config
@@ -76,11 +76,10 @@ You can use packer to manage hibiscus afterwards:
 ```
 
 # Neovim Macros
-Add these lines of top of your modules:
 ```fennel
 (require-macros :hibiscus.vim)
-;; or
-(import-macros {:augroup! aug!} :hibiscus.vim)
+; or
+(import-macros {: augroup!} :hibiscus.vim)
 ```
 
 ## keymaps
@@ -253,4 +252,144 @@ Sets buffer scoped variable {name} to {val}.
 ```clojure
 (b! gretting "Hello World!")
 ```
+
+# Core Macros
+```fennel
+(require-macros :hibiscus.core)
+; or
+(import-macros {: fstring} :hibiscus.core)
+```
+
+## fstring
+```clojure
+(fstring {str})
+```
+> wrapper around string.format, works like javascript's template literates
+
+##### Example:
+```clojure
+(let [name "foo"]
+  (fstring "hello ${name}"))
+```
+
+## pretty print
+```clojure
+(dump {...})
+```
+> pretty prints {...} into human readable form
+
+## general
+```clojure
+(or= {x} ...)
+```
+> checks if {x} is equal to any one of {...}
+
+## checking
+```clojure
+(nil? {x})
+```
+> checks if value of {x} is nil
+
+```clojure
+(boolean? {x})
+```
+> checks if {x} is of boolean type
+
+```clojure
+(string? {x})
+```
+> checks if {x} is of string type
+
+```clojure
+(number? {x})
+```
+> checks if {x} is of number type
+
+```clojure
+(odd? {int})
+```
+> checks if {int} is of odd parity
+
+```clojure
+(even? {int})
+```
+> checks if {int} is of even parity
+
+```clojure
+(function? {x})
+```
+> checks if {x} is of function type
+
+```clojure
+(table? {x})
+```
+> checks if {x} is of table type
+
+```clojure
+(list? {tbl})
+```
+> checks if {tbl} is valid list / array
+
+```clojure
+(empty? {tbl})
+```
+> checks if {tbl} has length of 0
+
+## unary operators
+```clojure
+(inc {int})
+```
+> increments {int} by 1 and returns its value
+
+```clojure
+(++ {var})
+```
+> increments variable {var} by 1 and returns its value
+
+```clojure
+(dec {int})
+```
+> decrements {int} by 1 and returns its value
+
+```clojure
+(-- {var})
+```
+> decrements variable {var} by 1 and returns its value
+
+## string concat
+```clojure
+(append {var} {str})
+```
+> appends {str} to variable {var}
+
+```clojure
+(tappend {tbl} {key} {str})
+```
+> appends {str} to {key} of table {tbl}
+
+```clojure
+(prepend {var} {str})
+```
+> prepends {str} to variable {var}
+
+```clojure
+(tprepend {tbl} {key} {str})
+```
+> prepends {str} to {key} of table {tbl}
+
+## table merging
+```clojure
+(merge-list {list1} {list2})
+```
+> merges all values of {list1} and {list2} together.
+
+```clojure
+(merge {tbl1} {tbl2})
+```
+> merges {tbl1} and {tbl2}, correctly appending lists
+
+```clojure
+(merge! {var} {tbl})
+```
+> merges values of {tbl} onto variable {var}
 
