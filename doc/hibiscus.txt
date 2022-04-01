@@ -1,0 +1,698 @@
+*hibiscus.txt*                            Opinionated fennel macros for neovim
+
+==============================================================================
+Table of Contents                                 *hibiscus-table-of-contents*
+
+1. Hibiscus.nvim                                      |hibiscus-hibiscus.nvim|
+  - Rational                                               |hibiscus-rational|
+2. Installation                                        |hibiscus-installation|
+3. Neovim Macros                                      |hibiscus-neovim-macros|
+  - keymaps                                                 |hibiscus-keymaps|
+  - autocmds                                               |hibiscus-autocmds|
+  - commands                                               |hibiscus-commands|
+  - misc                                                       |hibiscus-misc|
+  - vim options                                         |hibiscus-vim-options|
+  - variables                                             |hibiscus-variables|
+4. Core Macros                                          |hibiscus-core-macros|
+  - fstring                                                 |hibiscus-fstring|
+  - pretty print                                       |hibiscus-pretty-print|
+  - general                                                 |hibiscus-general|
+  - checking                                               |hibiscus-checking|
+  - unary operators                                 |hibiscus-unary-operators|
+  - string concat                                     |hibiscus-string-concat|
+  - table merging                                     |hibiscus-table-merging|
+5. End Credits                                          |hibiscus-end-credits|
+
+==============================================================================
+1. Hibiscus.nvim                                      *hibiscus-hibiscus.nvim*
+
+
+  :hibiscus: Highly opinionated macros to elegantly write your neovim config.
+
+
+Companion library for tangerine
+<https://github.com/udayvir-singh/tangerine.nvim>, but it can also be used
+standalone.
+
+RATIONAL                                                   *hibiscus-rational*
+
+
+- :candy: Syntactic eye candy over hellscape of lua api
+- :tanabata_tree: Provides missing features in both fennel and nvim api
+
+
+==============================================================================
+2. Installation                                        *hibiscus-installation*
+
+
+1. Create file `plugin/tangerine.lua` to bootstrap hibiscus:
+
+
+>
+    -- ~/.config/nvim/plugin/tangerine.lua
+    
+    -- pick your plugin manager, default [standalone]
+    local pack = "tangerine" or "packer" or "paq"
+    
+    local function bootstrap (name, url, path)
+        if vim.fn.empty(vim.fn.glob(path)) > 0 then
+            print(name .. ": installing in data dir...")
+    
+            vim.fn.system {"git", "clone", url, path}
+    
+            vim.cmd [[redraw]]
+            print(name .. ": finished installing")
+        end
+    end
+    
+    bootstrap (
+        "hibiscus.nvim",
+        "https://github.com/udayvir-singh/hibiscus.nvim",
+        vim.fn.stdpath [[data]] .. "/site/pack/" .. pack .. "/start/hibiscus.nvim"
+    )
+<
+
+
+
+1. Call the `setup()` function:
+
+
+>
+    -- NOTE: require before calling tangerine or your compiler
+    
+    require [[hibiscus]].setup()
+<
+
+
+
+1. Require a macro library at top of your modules:
+
+
+>
+    ; require all macros
+    (require-macros :hibiscus.core)
+    (require-macros :hibiscus.vim)
+    
+    ; require selected macros
+    (import-macros {: fstring} :hibiscus.core)
+    (import-macros {: map!}    :hibiscus.vim)
+<
+
+
+DONE: now start using these macros in your config
+
+------------------------------------------------------------------------------
+
+                                                             *hibiscus-Packer*
+
+Packer                                 You can use packer to manage hibiscus
+                                       afterwards:
+
+
+>
+    (local packer (require :packer))
+    
+    (packer.startup (fn []
+        (use :udayvir-singh/hibiscus.nvim)))
+<
+
+
+                                                                *hibiscus-Paq*
+
+>
+    (local paq (require :paq))
+    
+    (paq {
+        :udayvir-singh/hibiscus.nvim
+    })
+<
+
+
+==============================================================================
+3. Neovim Macros                                      *hibiscus-neovim-macros*
+
+>
+    (require-macros :hibiscus.vim)
+    ; or
+    (import-macros {: augroup!} :hibiscus.vim)
+<
+
+
+KEYMAPS                                                     *hibiscus-keymaps*
+
+                                                               *hibiscus-map!*
+
+map!                                   (map! {args} {lhs} {rhs})
+
+
+Defines vim keymap for the given modes from {lhs} to {rhs}
+
+ARGUMENTS: ~
+
+{args} can contain the following values:
+
+>
+    ; modes |                   options                          |
+    [ nivcx  :buffer :remap :silent :nowait :expr :unique :script ]
+<
+
+
+EXAMPLES: ~
+
+
+- For Vimscript:
+
+
+>
+    (map! [n :buffer] :R "echo &rtp")
+    
+    (let [rhs ":echo hello"]
+      (map! [nv :nowait] :lhs rhs))
+<
+
+
+
+- For Fennel Functions:
+
+
+>
+    (fn greet []
+      (print "Hello World!"))
+    
+    (map! [nx] :lhs 'greet) ; variables need to be quoted to indicate they are function
+    
+    (map! [nv] :lhs #(print "inline functions don't require quoting"))
+<
+
+
+AUTOCMDS                                                   *hibiscus-autocmds*
+
+                                                           *hibiscus-augroup!*
+
+augroup!                               (augroup! {name} {cmds})
+
+
+Defines autocmd group of {name} with {cmds} containing [groups pattern cmd]
+chunks.
+
+EXAMPLES: ~
+
+
+- For Vimscript:
+
+
+>
+    (local clj "clojure")
+    
+    (augroup! :greet
+      [[FileType]           clj   "echo hello"]
+      [[BufRead BufNewFile] *.fnl "echo hello"])
+<
+
+
+
+- For Fennel Functions:
+
+
+>
+    (fn hello [] (print :hello))
+    
+    (augroup! :greet
+      [[BufRead] * 'hello] ; remember to quote functions
+      [[BufRead] * #(print "HOLLA!")])
+<
+
+
+COMMANDS                                                   *hibiscus-commands*
+
+                                                           *hibiscus-command!*
+
+command!                               (command! {args} {lhs} {rhs})
+
+
+Defines user command {lhs} to {rhs}
+
+ARGUMENTS: ~
+
+{args} can contain the same opts as `:command`:
+
+>
+    [
+      :bar      true
+      :bang     true
+      :buffer   true
+      :register true
+      :range    (or true <string>)
+      :addr     <string>
+      :count    <string>
+      :nargs    <string>
+      :complete <string>
+    ]
+<
+
+
+RHS PARAMETERS: ~
+
+`:command` parameters like `<bang>` are translated by hibiscus into following
+table:
+
+>
+    {
+      :bang  <boolean>
+      :qargs <string>
+      :count <number>
+      :lines [<number> <number>]
+    }
+<
+
+
+They are passed as first argument to lua function, For example:
+
+>
+    (fn example [opts]
+      (print opts.qargs))
+    
+    (command! [:nargs "*"] :Lhs 'example)
+<
+
+
+EXAMPLES: ~
+
+
+- For Vimscript:
+
+
+>
+    (command! [:nargs 1] :Lhs "echo 'hello ' . <q-args>")
+<
+
+
+
+- For Fennel Functions:
+
+
+>
+    (fn greet [opts]
+      (print :hello opts.qargs))
+    
+    (command! [:nargs 1] :Lhs 'greet) ; again remember to quote 
+    
+    (command! [:bang true] :Lhs '(print opts.bang))
+    ; or
+    (command! [:bang true] :Lhs (fn [opts] (print opts.bang)))
+<
+
+
+MISC                                                           *hibiscus-misc*
+
+                                                               *hibiscus-vlua*
+
+vlua                                   (vlua {func})
+
+
+Wraps fennel {func} into valid vimscript cmd
+
+EXAMPLE: ~
+
+>
+    (local cmd (vlua some-func))
+    
+    (print cmd) ; -> ":lua _G.hibiscus.store.func()"
+<
+
+
+                                                               *hibiscus-exec*
+
+exec                                   (exec {cmds})
+
+
+Converts [cmd] chunks in {cmds} to valid vim.cmd call
+
+EXAMPLE: ~
+
+>
+    (exec [
+      [:set "nowrap"]
+      [:echo "hello" "world"]
+    ])
+<
+
+
+                                                             *hibiscus-concat*
+
+concat                                 (concat {list} {sep})
+
+
+Concats strings in {list} with {sep} at compile time
+
+EXAMPLES: ~
+
+>
+    (concat ["hello" "foo"] " ") ; -> "hello foo"
+    
+    (concat ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
+<
+
+
+VIM OPTIONS                                             *hibiscus-vim-options*
+
+                                                               *hibiscus-set!*
+
+set!                                   Works like command `:set`, sets vim
+                                       option {name} to {val}
+
+
+>
+    (set! nobackup)
+    (set! tabstop 4)
+    
+    (each [_ opt (ipairs ["number" "rnu"])]
+          (set! opt true))
+<
+
+
+                                                               *hibiscus-set+*
+
+set+                                   Appends {val} to string-style option
+                                       {name}
+
+
+>
+    (set+ wildignore "*.foo")
+<
+
+
+                                                               *hibiscus-set^*
+
+set^                                   Prepends {val} to string-style option
+                                       {name}
+
+
+>
+    (set^ wildignore ["*.foo" "*.baz"])
+<
+
+
+                                                               *hibiscus-rem!*
+
+rem!                                   Removes {val} from string-style option
+                                       {name}
+
+
+>
+    (rem! wildignore "*.baz")
+<
+
+
+                                                             *hibiscus-color!*
+
+color!                                 Sets vim colorscheme to {name}
+
+
+>
+    (color! "desert")
+<
+
+
+VARIABLES                                                 *hibiscus-variables*
+
+                                                                 *hibiscus-g!*
+
+g!                                     Sets global variable {name} to {val}.
+
+
+>
+    (g! mapleader " ")
+<
+
+
+                                                                 *hibiscus-b!*
+
+b!                                     Sets buffer scoped variable {name} to
+                                       {val}.
+
+
+>
+    (b! gretting "Hello World!")
+<
+
+
+==============================================================================
+4. Core Macros                                          *hibiscus-core-macros*
+
+>
+    (require-macros :hibiscus.core)
+    ; or
+    (import-macros {: fstring} :hibiscus.core)
+<
+
+
+FSTRING                                                     *hibiscus-fstring*
+
+>
+    (fstring {str})
+<
+
+
+
+  wrapper around string.format, works like javascript’s template literates
+
+
+EXAMPLE: ~
+
+>
+    (let [name "foo"]
+      (fstring "hello ${name}"))
+<
+
+
+PRETTY PRINT                                           *hibiscus-pretty-print*
+
+>
+    (dump {...})
+<
+
+
+
+  pretty prints {…} into human readable form
+
+
+GENERAL                                                     *hibiscus-general*
+
+>
+    (or= {x} ...)
+<
+
+
+
+  checks if {x} is equal to any one of {…}
+
+
+CHECKING                                                   *hibiscus-checking*
+
+>
+    (nil? {x})
+<
+
+
+
+  checks if value of {x} is nil
+
+
+>
+    (boolean? {x})
+<
+
+
+
+  checks if {x} is of boolean type
+
+
+>
+    (string? {x})
+<
+
+
+
+  checks if {x} is of string type
+
+
+>
+    (number? {x})
+<
+
+
+
+  checks if {x} is of number type
+
+
+>
+    (odd? {int})
+<
+
+
+
+  checks if {int} is of odd parity
+
+
+>
+    (even? {int})
+<
+
+
+
+  checks if {int} is of even parity
+
+
+>
+    (function? {x})
+<
+
+
+
+  checks if {x} is of function type
+
+
+>
+    (table? {x})
+<
+
+
+
+  checks if {x} is of table type
+
+
+>
+    (list? {tbl})
+<
+
+
+
+  checks if {tbl} is valid list / array
+
+
+>
+    (empty? {tbl})
+<
+
+
+
+  checks if {tbl} has length of 0
+
+
+UNARY OPERATORS                                     *hibiscus-unary-operators*
+
+>
+    (inc {int})
+<
+
+
+
+  increments {int} by 1 and returns its value
+
+
+>
+    (++ {var})
+<
+
+
+
+  increments variable {var} by 1 and returns its value
+
+
+>
+    (dec {int})
+<
+
+
+
+  decrements {int} by 1 and returns its value
+
+
+>
+    (-- {var})
+<
+
+
+
+  decrements variable {var} by 1 and returns its value
+
+
+STRING CONCAT                                         *hibiscus-string-concat*
+
+>
+    (append {var} {str})
+<
+
+
+
+  appends {str} to variable {var}
+
+
+>
+    (tappend {tbl} {key} {str})
+<
+
+
+
+  appends {str} to {key} of table {tbl}
+
+
+>
+    (prepend {var} {str})
+<
+
+
+
+  prepends {str} to variable {var}
+
+
+>
+    (tprepend {tbl} {key} {str})
+<
+
+
+
+  prepends {str} to {key} of table {tbl}
+
+
+TABLE MERGING                                         *hibiscus-table-merging*
+
+>
+    (merge-list {list1} {list2})
+<
+
+
+
+  merges all values of {list1} and {list2} together.
+
+
+>
+    (merge {tbl1} {tbl2})
+<
+
+
+
+  merges {tbl1} and {tbl2}, correctly appending lists
+
+
+>
+    (merge! {var} {tbl})
+<
+
+
+
+  merges values of {tbl} onto variable {var}
+
+
+==============================================================================
+5. End Credits                                          *hibiscus-end-credits*
+
+
+- aniseed <https://github.com/Olical/aniseed>: for introducing me to fennel
+- zest <https://github.com/tsbohc/zest.nvim>: for inspiring `hibiscus.vim` macros
+
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
+
+vim:tw=78:ts=8:noet:ft=help:norl:
