@@ -200,6 +200,47 @@ They are passed as first argument to lua function, For example:
 (command! [:bang true] :Lhs (fn [opts] (print opts.bang)))
 ```
 
+## misc
+#### vlua
+<pre lang="clojure"><code>(vlua {func})
+</pre></code>
+
+Wraps fennel {func} into valid vimscript cmd
+
+##### Example:
+```clojure
+(local cmd (vlua some-func))
+
+(print cmd) ; -> ":lua _G.hibiscus.store.func()"
+```
+
+#### exec
+<pre lang="clojure"><code>(exec {cmds})
+</pre></code>
+
+Converts [cmd] chunks in {cmds} to valid vim.cmd call
+
+##### Example:
+```clojure
+(exec [
+  [:set "nowrap"]
+  [:echo "hello" "world"]
+])
+```
+
+#### concat
+<pre lang="clojure"><code>(concat {list} {sep})
+</pre></code>
+
+Concats strings in {list} with {sep} at compile time
+
+##### Examples:
+```clojure
+(concat ["hello" "foo"] " ") ; -> "hello foo"
+
+(concat ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
+```
+
 ## vim options
 #### set!
 Works like command `:set`, sets vim option {name} to {val}
@@ -393,3 +434,6 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > merges values of {tbl} onto variable {var}
 
+# End Credits
+- [aniseed](https://github.com/Olical/aniseed): for introducing me to fennel
+- [zest](https://github.com/tsbohc/zest.nvim): for inspiring `hibiscus.vim` macros
