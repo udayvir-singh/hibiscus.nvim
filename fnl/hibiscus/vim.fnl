@@ -114,13 +114,14 @@
   (assert (. args 1) 
           "map: missing required argument 'mode'.")
   (let [modes (tostring (table.remove args 1))
-        opts  {:noremap true}]
+        opts  {:noremap true :silent true}]
     (var buf false)
     (each [_ key (ipairs args)]
       (match key
-        :buffer (set buf true)
-        :remap  (tset opts :noremap false)
-        _       (tset opts key true)))
+        :buffer  (set buf true)
+        :remap   (tset opts :noremap false)
+        :verbose (tset opts :silent false)
+        _        (tset opts key true)))
     :return
     {: modes : opts : buf}))
 
@@ -238,7 +239,7 @@
 
 (lmd color! [name]
   "sets vim colorscheme to 'name'."
-  (exec [[:colorscheme name]]))
+  (exec [[:colorscheme (parse-sym name)]]))
 
 
 ;; -------------------- ;;

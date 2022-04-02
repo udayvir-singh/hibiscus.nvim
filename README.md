@@ -92,9 +92,13 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 ##### Arguments:
 {args} can contain the following values:
 ```clojure
-; modes |                   options                          |
-[ nivcx  :buffer :remap :silent :nowait :expr :unique :script ]
+; modes |                   options                           |
+[ nivcx  :remap :verbose :buffer :nowait :expr :unique :script ]
 ```
+
+NOTE:
+- `verbose`: opposite to `silent`
+- `remap`: opposite to `noremap`
 
 ##### Examples:
 - For Vimscript:
@@ -280,7 +284,7 @@ Removes {val} from string-style option {name}
 Sets vim colorscheme to {name}
 
 ```clojure
-(color! "desert")
+(color! desert)
 ```
 
 ## variables

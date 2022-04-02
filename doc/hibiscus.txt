@@ -152,10 +152,12 @@ ARGUMENTS: ~
 {args} can contain the following values:
 
 >
-    ; modes |                   options                          |
-    [ nivcx  :buffer :remap :silent :nowait :expr :unique :script ]
+    ; modes |                   options                           |
+    [ nivcx  :remap :verbose :buffer :nowait :expr :unique :script ]
 <
 
+
+NOTE: - `verbose`: opposite to `silent` - `remap`: opposite to `noremap`
 
 EXAMPLES: ~
 
@@ -413,7 +415,7 @@ color!                                 Sets vim colorscheme to {name}
 
 
 >
-    (color! "desert")
+    (color! desert)
 <
 
 
