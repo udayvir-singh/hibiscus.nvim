@@ -136,8 +136,8 @@ Defines autocmd group of {name} with {cmds} containing [groups pattern cmd] chun
 (local clj "clojure")
 
 (augroup! :greet
-  [[FileType]           clj   "echo hello"]
-  [[BufRead BufNewFile] *.fnl "echo hello"])
+  [[FileType]           clj           "echo hello"]
+  [[BufRead BufNewFile] [*.clj *.fnl] "echo hello"])
 ```
 
 - For Fennel Functions:

@@ -144,10 +144,16 @@
 ;; -------------------- ;;
 ;;       AUTOCMDS       ;;
 ;; -------------------- ;;
+(lambda parse-pat [pat]
+  "parses augroup pattern 'pat' into a valid string."
+  (if (sequence? pat)
+      (concat (vim.tbl_map parse-sym pat) ",")
+      (parse-sym pat)))
+
 (lambda parse-autocmd [[groups pattern cmd]]
   "converts given args into valid autocmd command."
   (let [groups    (table.concat (vim.tbl_map tostring groups) ",")
-        pattern   (parse-sym pattern)
+        pattern   (parse-pat pattern)
         (pre cmd) (parse-cmd cmd "()")]
     :return
     (values pre [:au groups pattern cmd])))

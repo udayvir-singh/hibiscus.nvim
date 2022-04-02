@@ -210,8 +210,8 @@ EXAMPLES: ~
     (local clj "clojure")
     
     (augroup! :greet
-      [[FileType]           clj   "echo hello"]
-      [[BufRead BufNewFile] *.fnl "echo hello"])
+      [[FileType]           clj           "echo hello"]
+      [[BufRead BufNewFile] [*.clj *.fnl] "echo hello"])
 <
 
 
