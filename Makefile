@@ -1,4 +1,4 @@
-INSTALL_DIR = ~/.local/share/nvim/site/pack/hibiscus/start/hibiscus.nvim
+INSTALL_DIR = ~/.local/share/nvim/site/pack/tangerine/start/hibiscus.nvim
 
 ifndef VERBOSE
 .SILENT:
