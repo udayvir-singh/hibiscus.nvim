@@ -208,7 +208,7 @@
 
 (lmd command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
-  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n +" " "))
+  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n +" " ") false)
         options   (parse-command-args args)]
     :return
     `(do ,pre ,(exec [[:command! options lhs cmd]]))))
