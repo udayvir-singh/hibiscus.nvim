@@ -9,7 +9,7 @@ but it can also be used standalone.
 - :tanabata_tree: Provides missing features in both fennel and nvim api
 
 # Installation
-1. Create file `plugin/tangerine.lua` to bootstrap hibiscus:
+- Create file `plugin/tangerine.lua` to bootstrap hibiscus:
 ```lua
 -- ~/.config/nvim/plugin/tangerine.lua
 
@@ -34,14 +34,7 @@ bootstrap (
 )
 ```
 
-2. Call the `setup()` function:
-```lua
--- NOTE: require before calling tangerine or your compiler
-
-require [[hibiscus]].setup()
-```
-
-3. Require a macro library at top of your modules:
+- Require a macro library at top of your modules:
 ```fennel
 ; require all macros
 (require-macros :hibiscus.core)

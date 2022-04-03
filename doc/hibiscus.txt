@@ -46,7 +46,7 @@ RATIONAL                                                   *hibiscus-rational*
 2. Installation                                        *hibiscus-installation*
 
 
-1. Create file `plugin/tangerine.lua` to bootstrap hibiscus:
+- Create file `plugin/tangerine.lua` to bootstrap hibiscus:
 
 
 >
@@ -75,18 +75,7 @@ RATIONAL                                                   *hibiscus-rational*
 
 
 
-1. Call the `setup()` function:
-
-
->
-    -- NOTE: require before calling tangerine or your compiler
-    
-    require [[hibiscus]].setup()
-<
-
-
-
-1. Require a macro library at top of your modules:
+- Require a macro library at top of your modules:
 
 
 >

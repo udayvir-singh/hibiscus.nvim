@@ -86,12 +86,18 @@
   (string.gsub "func_xxxxxxxx" "x"
                #(string.format "%x" (math.random 16))))
 
+(lambda store [id func]
+  "globally defines 'id' in store to 'func'."
+  `(do (if (not _G.hibiscus)
+           (tset _G :hibiscus {:store []}))
+       (tset _G.hibiscus.store ,id ,func)))
+
 (lambda vlua [func args ?expr]
   "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
   (local id   (gen-id))
   (local call (if ?expr "v:lua." ":lua "))
   (values
-    (list `tset `_G.hibiscus.store id func)
+    (store id func)
     (fstring "${call}_G.hibiscus.store.${id}${args}")))
 
 (lambda parse-cmd [xs ...]
