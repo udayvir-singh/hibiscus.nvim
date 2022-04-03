@@ -6,14 +6,15 @@ Table of Contents                                 *hibiscus-table-of-contents*
 1. Hibiscus.nvim                                      |hibiscus-hibiscus.nvim|
   - Rational                                               |hibiscus-rational|
 2. Installation                                        |hibiscus-installation|
-3. Neovim Macros                                      |hibiscus-neovim-macros|
+3. Packer Macros                                      |hibiscus-packer-macros|
+4. Neovim Macros                                      |hibiscus-neovim-macros|
   - keymaps                                                 |hibiscus-keymaps|
   - autocmds                                               |hibiscus-autocmds|
   - commands                                               |hibiscus-commands|
   - misc                                                       |hibiscus-misc|
   - vim options                                         |hibiscus-vim-options|
   - variables                                             |hibiscus-variables|
-4. Core Macros                                          |hibiscus-core-macros|
+5. Core Macros                                          |hibiscus-core-macros|
   - fstring                                                 |hibiscus-fstring|
   - pretty print                                       |hibiscus-pretty-print|
   - general                                                 |hibiscus-general|
@@ -21,7 +22,7 @@ Table of Contents                                 *hibiscus-table-of-contents*
   - unary operators                                 |hibiscus-unary-operators|
   - string concat                                     |hibiscus-string-concat|
   - table merging                                     |hibiscus-table-merging|
-5. End Credits                                          |hibiscus-end-credits|
+6. End Credits                                          |hibiscus-end-credits|
 
 ==============================================================================
 1. Hibiscus.nvim                                      *hibiscus-hibiscus.nvim*
@@ -55,10 +56,10 @@ RATIONAL                                                   *hibiscus-rational*
     local pack = "tangerine" or "packer" or "paq"
     
     local function bootstrap (name, url, path)
-        if vim.fn.empty(vim.fn.glob(path)) > 0 then
+        if vim.fn.isdirectory(path) == 0 then
             print(name .. ": installing in data dir...")
     
-            vim.fn.system {"git", "clone", url, path}
+            vim.fn.system {"git", "clone", "--depth", "1", url, path}
     
             vim.cmd [[redraw]]
             print(name .. ": finished installing")
@@ -110,10 +111,12 @@ Packer                                 You can use packer to manage hibiscus
 
 
 >
-    (local packer (require :packer))
+    (require-macros :hibiscus.packer)
     
-    (packer.startup (fn []
-        (use :udayvir-singh/hibiscus.nvim)))
+    (packer-setup)
+    
+    (packer
+      (use! :udayvir-singh/hibiscus.nvim))
 <
 
 
@@ -123,13 +126,58 @@ Packer                                 You can use packer to manage hibiscus
     (local paq (require :paq))
     
     (paq {
-        :udayvir-singh/hibiscus.nvim
+      :udayvir-singh/hibiscus.nvim
     })
 <
 
 
 ==============================================================================
-3. Neovim Macros                                      *hibiscus-neovim-macros*
+3. Packer Macros                                      *hibiscus-packer-macros*
+
+>
+    (require-macros :hibiscus.packer)
+<
+
+
+                                                       *hibiscus-packer-setup*
+
+packer-setup                           (packer-setup {opts*})
+
+
+Bootstraps packer and calls packer.init function with {opts*}.
+
+                                                             *hibiscus-packer*
+
+packer                                 (packer {…})
+
+
+Wrapper around packer.startup function, automatically adds packer to plugin
+list and syncs it.
+
+                                                               *hibiscus-use!*
+
+use!                                   (use! {name} {…})
+
+
+Much more lisp friendly wrapper over packer.use function.
+
+EXAMPLES: ~
+
+>
+    (packer
+      (use! :udayvir-singh/tangerine.nvim)
+    
+      (use! :udayvir-singh/hibiscus.nvim
+            :requires ["udayvir-singh/tangerine.nvim"])
+    
+      (use! :some-plugin
+            :module "path/module" ; automatically requires that module
+            ...))
+<
+
+
+==============================================================================
+4. Neovim Macros                                      *hibiscus-neovim-macros*
 
 >
     (require-macros :hibiscus.vim)
@@ -443,7 +491,7 @@ b!                                     Sets buffer scoped variable {name} to
 
 
 ==============================================================================
-4. Core Macros                                          *hibiscus-core-macros*
+5. Core Macros                                          *hibiscus-core-macros*
 
 >
     (require-macros :hibiscus.core)
@@ -691,7 +739,7 @@ TABLE MERGING                                         *hibiscus-table-merging*
 
 
 ==============================================================================
-5. End Credits                                          *hibiscus-end-credits*
+6. End Credits                                          *hibiscus-end-credits*
 
 
 - aniseed <https://github.com/Olical/aniseed>: for introducing me to fennel

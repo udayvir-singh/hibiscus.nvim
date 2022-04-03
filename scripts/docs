@@ -67,6 +67,11 @@ LOGFILE="$(mktemp)"
 panvimdoc () {
 	< "${SOURCE}" \
 	gawk '{ 
+		# parse optional args
+		if ($0 ~ "{.+?}") {
+			gsub("?}", "*}", $0)
+		}
+
 		# parse header blocks
 		if ($1 == "#####" && $(NF) ~ ":$" ) {
 			$(NF + 1)="~"

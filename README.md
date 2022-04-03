@@ -17,10 +17,10 @@ but it can also be used standalone.
 local pack = "tangerine" or "packer" or "paq"
 
 local function bootstrap (name, url, path)
-	if vim.fn.empty(vim.fn.glob(path)) > 0 then
+	if vim.fn.isdirectory(path) == 0 then
 		print(name .. ": installing in data dir...")
 
-		vim.fn.system {"git", "clone", url, path}
+		vim.fn.system {"git", "clone", "--depth", "1", url, path}
 
 		vim.cmd [[redraw]]
 		print(name .. ": finished installing")
@@ -60,10 +60,12 @@ DONE: now start using these macros in your config
 You can use packer to manage hibiscus afterwards:
 
 ```fennel
-(local packer (require :packer))
+(require-macros :hibiscus.packer)
 
-(packer.startup (fn []
-	(use :udayvir-singh/hibiscus.nvim)))
+(packer-setup)
+
+(packer
+  (use! :udayvir-singh/hibiscus.nvim))
 ```
 
 #### Paq
@@ -71,8 +73,44 @@ You can use packer to manage hibiscus afterwards:
 (local paq (require :paq))
 
 (paq {
-	:udayvir-singh/hibiscus.nvim
+  :udayvir-singh/hibiscus.nvim
 })
+```
+
+# Packer Macros
+```fennel
+(require-macros :hibiscus.packer)
+```
+
+#### packer-setup
+<pre lang="clojure"><code>(packer-setup {opts?})
+</pre></code>
+
+Bootstraps packer and calls packer.init function with {opts?}.
+
+#### packer
+<pre lang="clojure"><code>(packer {...})
+</pre></code>
+
+Wrapper around packer.startup function, automatically adds packer to plugin list and syncs it.
+
+#### use!
+<pre lang="clojure"><code>(use! {name} {...})
+</pre></code>
+
+Much more lisp friendly wrapper over packer.use function.
+
+##### Examples:
+```clojure
+(packer
+  (use! :udayvir-singh/tangerine.nvim)
+
+  (use! :udayvir-singh/hibiscus.nvim
+        :requires ["udayvir-singh/tangerine.nvim"])
+
+  (use! :some-plugin
+        :module "path/module" ; automatically requires that module
+        ...))
 ```
 
 # Neovim Macros
