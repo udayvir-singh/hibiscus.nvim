@@ -1,4 +1,4 @@
-(import-macros {: odd? : even?} :hibiscus.core)
+(import-macros {: odd? : even? : append} :hibiscus.core)
 
 (local M {})
 
@@ -14,6 +14,7 @@
        (tset _G :packer_bootstrap
              (vim.fn.system [:git :clone "--depth" "1" ,url ,path]))
        (vim.cmd :redraw)
+       (vim.cmd "packadd packer.nvim")
        (print "packer.nvim: installed"))))
 
 (fn M.packer-setup [opts]
