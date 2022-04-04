@@ -102,7 +102,7 @@
 
 (lambda parse-cmd [xs ...]
   "parses command 'xs', wrapping it with vlua if required."
-  (if (func?  xs) (vlua ...)
+  (if (func?  xs) (vlua xs ...)
       (quote? xs) (vlua (unquote- xs) ...)
       :else
       (values nil xs)))
