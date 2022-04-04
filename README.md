@@ -9,7 +9,7 @@ but it can also be used standalone.
 - :tanabata_tree: Provides missing features in both fennel and nvim api
 
 # Installation
-- Create file `plugin/tangerine.lua` to bootstrap hibiscus:
+- Create file `plugin/1-tangerine.lua` to bootstrap hibiscus:
 ```lua
 -- ~/.config/nvim/plugin/tangerine.lua
 

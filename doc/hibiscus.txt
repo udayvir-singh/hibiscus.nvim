@@ -46,7 +46,7 @@ RATIONAL                                                   *hibiscus-rational*
 2. Installation                                        *hibiscus-installation*
 
 
-- Create file `plugin/tangerine.lua` to bootstrap hibiscus:
+- Create file `plugin/1-tangerine.lua` to bootstrap hibiscus:
 
 
 >
