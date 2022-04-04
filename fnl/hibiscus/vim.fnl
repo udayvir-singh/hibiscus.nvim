@@ -87,10 +87,10 @@
                #(string.format "%x" (math.random 16))))
 
 (lambda store [id func]
-  "globally defines 'id' in store to 'func'."
+  "globally stores 'func' to 'id' in hibiscus."
   `(do (if (not _G.hibiscus)
-           (tset _G :hibiscus {:store []}))
-       (tset _G.hibiscus.store ,id ,func)))
+           (tset _G :hibiscus []))
+       (tset _G.hibiscus ,id ,func)))
 
 (lambda vlua [func args ?expr]
   "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
@@ -98,7 +98,7 @@
   (local call (if ?expr "v:lua." ":lua "))
   (values
     (store id func)
-    (fstring "${call}_G.hibiscus.store.${id}${args}")))
+    (fstring "${call}_G.hibiscus.${id}${args}")))
 
 (lambda parse-cmd [xs ...]
   "parses command 'xs', wrapping it with vlua if required."
