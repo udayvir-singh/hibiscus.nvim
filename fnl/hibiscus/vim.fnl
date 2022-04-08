@@ -92,10 +92,10 @@
            (tset _G :hibiscus []))
        (tset _G.hibiscus ,id ,func)))
 
-(lambda vlua [func args ?expr]
+(lambda vlua [func args expr? cmd?]
   "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
   (local id   (gen-id))
-  (local call (if ?expr "v:lua." "<cmd>lua "))
+  (local call (if expr? "v:lua." cmd? "<cmd>lua " ":lua "))
   (values
     (store id func)
     (fstring "${call}_G.hibiscus.${id}${args}")))
@@ -134,7 +134,7 @@
 (lmd map! [args lhs rhs]
   "defines vim keymap for modes in 'args'."
   (local out [])
-  (let [(pre cmd) (if (vim.tbl_contains args :expr) (parse-cmd rhs "()" true) (parse-cmd rhs "()<CR>"))
+  (let [(pre cmd) (if (vim.tbl_contains args :expr) (parse-cmd rhs "()" true false) (parse-cmd rhs "()<CR>" false true))
         args      (parse-map-args args)]
     (table.insert out pre)
     :mapping
@@ -160,7 +160,7 @@
   "converts given args into valid autocmd command."
   (let [groups    (table.concat (vim.tbl_map tostring groups) ",")
         pattern   (parse-pat pattern)
-        (pre cmd) (parse-cmd cmd "()")]
+        (pre cmd) (parse-cmd cmd "()" false false)]
     :return
     (values pre [:au groups pattern cmd])))
 
@@ -214,7 +214,7 @@
 
 (lmd command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
-  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n +" " ") false)
+  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n +" " ") false false)
         options   (parse-command-args args)]
     :return
     `(do ,pre ,(exec [[:command! options lhs cmd]]))))
