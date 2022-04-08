@@ -95,7 +95,7 @@
 (lambda vlua [func args ?expr]
   "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
   (local id   (gen-id))
-  (local call (if ?expr "v:lua." ":lua "))
+  (local call (if ?expr "v:lua." "<cmd>lua "))
   (values
     (store id func)
     (fstring "${call}_G.hibiscus.${id}${args}")))
@@ -201,7 +201,7 @@
           "command: expected even number of values in args.")
   (var out "")
   (each [idx val (ipairs args)]
-    (if 
+    (if
       ; parse keys
       (odd? idx)
       (append out (.. "-" val))
