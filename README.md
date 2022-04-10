@@ -346,10 +346,12 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > wrapper around string.format, works like javascript's template literates
 
-##### Example:
+##### Examples:
 ```clojure
-(let [name "foo"]
-  (fstring "hello ${name}"))
+(local name "foo")
+(fstring "hello ${name}")
+
+(fstring "lua expressions also work, like ${{ 2 + 2 }}")
 ```
 
 ## pretty print

@@ -37,6 +37,29 @@
 
 
 ;; -------------------- ;;
+;;       FSTRING        ;;
+;; -------------------- ;;
+(lambda gen-var [expr]
+  "generates variable from lua 'expr'."
+  (local symbol (gensym :fstring_var))
+  :return
+  `(let [,symbol nil]
+     (lua ,(.. (tostring symbol) "=" expr))
+     ,symbol))
+
+(lmd fstring [str]
+  "wrapper around string.format, works like javascript's template literates."
+  (local args [])
+  (each [xs (str:gmatch "$({{?.-}}?)")]
+        (if (xs:find "^{[^{]")
+            (table.insert args (sym (xs:match "^{(.+)}$")))
+            :else
+            (table.insert args (gen-var (xs:match "^{{(.+)}}$")))))
+  :return
+  `(string.format ,(str:gsub "${{?.-}}?" "%%s") ,(unpack args)))
+
+
+;; -------------------- ;;
 ;;       CHECKING       ;;
 ;; -------------------- ;;
 (fun nil? [x] 
@@ -119,14 +142,6 @@
 (lmd tprepend [tbl key str]
   "prepends 'str' to 'key' of table 'tbl'."
   (tset- tbl key `(.. ,str (or (. ,tbl ,key) ""))))
-
-(lmd fstring [str]
-  "wrapper around string.format, works like javascript's template literates."
-  (local args [])
-  (each [xs (str:gmatch "${(.-)}")]
-        (table.insert args (sym xs)))
-  :return
-  `(string.format ,(str:gsub "${.-}" "%%s") ,(unpack args)))
 
 
 ;; -------------------- ;;

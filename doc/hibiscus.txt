@@ -500,11 +500,13 @@ FSTRING                                                     *hibiscus-fstring*
   wrapper around string.format, works like javascript’s template literates
 
 
-EXAMPLE: ~
+EXAMPLES: ~
 
 >
-    (let [name "foo"]
-      (fstring "hello ${name}"))
+    (local name "foo")
+    (fstring "hello ${name}")
+    
+    (fstring "lua expressions also work, like ${{ 2 + 2 }}")
 <
 
 
