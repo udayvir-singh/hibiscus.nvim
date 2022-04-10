@@ -109,7 +109,7 @@
 
 (lambda M.vlua [func ?args]
   "wraps vlua's return value in do block for user."
-  `(do ,(vlua func (.. "(" (or ?args "") ")"))))
+  `(do ,(vlua func (.. "(" (or ?args "") ")") false false)))
 
 
 ;; -------------------- ;;
