@@ -83,7 +83,9 @@
 
 (lambda gen-id []
   "generates random id for vlua functions."
-  (string.gsub "func_xxxxxxxx" "x"
+  (math.randomseed
+    (string.gsub "xxxxxxxxxxxxxxxxxxxx" "x" #(math.random 100000)))
+  (string.gsub "func_xxxxxxxxxxxxxxxx" "x"
                #(string.format "%x" (math.random 16))))
 
 (lambda store [id func]
