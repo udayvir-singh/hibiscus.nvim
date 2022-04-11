@@ -81,11 +81,20 @@
       (quote (fn [,(sym :opts)] ,ref))
       (do ref)))
 
+(lambda gen-hash [name]
+  "generates psuedo random hash based on 'name'."
+  (var out 0)
+  (for [i 1 100]
+    (set out (+ out (string.byte name (math.random (# name))))))
+  (each [v (name:gmatch ".")]
+    (set out (+ out (string.byte v))))
+  :return out)
+
 (lambda gen-id [name]
   "generates random id for vlua functions."
   (math.randomseed
-    (+ (string.gsub name "." string.byte) (math.random 100000) (os.time)))
-  (string.gsub "func_xxxxxxxxxxxxxxxx" "x"
+    (+ (gen-hash name) (math.random 1000000) (os.time)))
+  (string.gsub "func_xxxxxxxxxx" "x"
                #(string.format "%x" (math.random 16))))
 
 (lambda store [id func]
