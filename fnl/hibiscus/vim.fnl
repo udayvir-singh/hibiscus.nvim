@@ -81,10 +81,10 @@
       (quote (fn [,(sym :opts)] ,ref))
       (do ref)))
 
-(lambda gen-id []
+(lambda gen-id [name]
   "generates random id for vlua functions."
   (math.randomseed
-    (string.gsub "xxxxxxxxxxxxxxxxxxxx" "x" #(math.random 100000)))
+    (+ (string.gsub name "." string.byte) (math.random 100000) (os.time)))
   (string.gsub "func_xxxxxxxxxxxxxxxx" "x"
                #(string.format "%x" (math.random 16))))
 
@@ -96,7 +96,7 @@
 
 (lambda vlua [func args expr? cmd?]
   "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
-  (local id   (gen-id))
+  (local id   (gen-id (tostring func)))
   (local call (if expr? "v:lua." cmd? "<cmd>lua " ":lua "))
   (values
     (store id func)
