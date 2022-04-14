@@ -176,9 +176,9 @@
   `(let [out# []]
      (each [# v# (ipairs [,...])]
        (if (?. _G.tangerine :api :serialize)
-           (table.insert out# (_G.tangerine.api.serialize v#))
-           (table.insert out# (vim.inspect v#))))
-     (print (unpack out#))))
+           (table.insert out# [(_G.tangerine.api.serialize v#)])
+           (table.insert out# [(vim.inspect v#)])))
+     (vim.api.nvim_echo out# false [])))
 
 
 :return M
