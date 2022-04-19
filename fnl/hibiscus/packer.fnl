@@ -1,4 +1,4 @@
-(import-macros {: odd? : even? : append} :hibiscus.core)
+(import-macros {: odd? : even? : string? : append} :hibiscus.core)
 
 (local M {})
 
@@ -42,8 +42,6 @@
 ;; -------------------- ;;
 (lambda parse-conf [name opts]
   "parses 'name' and list of 'opts' into valid packer.use args."
-  (assert (even? (# opts))
-          (.. "packer-use: error in " name " opts must contain even number of key-value pairs."))
   (local out [name])
   (each [idx val (ipairs opts)]
     (local nval (. opts (+ idx 1)))
@@ -56,6 +54,13 @@
 
 (lambda M.use! [name ...]
   "syntactic sugar over packer's use function."
+  (assert-compile
+    (string? name)
+    (.. "  packer-use: invalid name " (view name)) name)
+  (assert-compile
+    (even? (# [...]))
+    (.. "  packer-use: error in :" name ", opts must contain even number of key-value pairs."))
+  :return
   `(use ,(parse-conf name [...])))
 
 

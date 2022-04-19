@@ -4,6 +4,9 @@
 Companion library for [tangerine](https://github.com/udayvir-singh/tangerine.nvim),
 but it can also be used standalone.
 
+<!-- ignore-line -->
+![Neovim version](https://img.shields.io/badge/For_Neovim-0.7-dab?style=for-the-badge&logo=neovim&logoColor=dab)
+
 ## Rational
 - :candy: Syntactic eye candy over hellscape of lua api
 - :tanabata_tree: Provides missing features in both fennel and nvim api
@@ -45,7 +48,7 @@ bootstrap (
 (import-macros {: map!}    :hibiscus.vim)
 ```
 
-DONE: now start using these macros in your config
+:tada: now start using these macros in your config
 
 ---
 
@@ -127,31 +130,27 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 [ nivcx  :remap :verbose :buffer :nowait :expr :unique :script ]
 ```
 
-NOTE:
 - `verbose`: opposite to `silent`
 - `remap`: opposite to `noremap`
 
 ##### Examples:
-- For Vimscript:
 ```clojure
+;; -------------------- ;;
+;;      VIMSCRIPT       ;;
+;; -------------------- ;;
 (map! [n :buffer] :R "echo &rtp")
+(map! [n :remap]  :P "<Plug>(some-function)")
 
-(let [rhs ":echo hello"]
-  (map! [nv :nowait] :lhs rhs))
-```
 
-- For Fennel Functions:
-```clojure
+;; -------------------- ;;
+;;        FENNEL        ;;
+;; -------------------- ;;
 (map! [nv :expr] :j
       '(if (> vim.v.count 0) "j" "gj"))
 
-(fn greet []
-  (print "Hello World!"))
+(local greet #(print "Hello World!"))
 
-(map! [n] :lhs 'greet) ; variables need to be quoted to indicate they are function
-
-(map! [n] :lhs #(print "inline functions don't require quoting"))
-
+(map! [n] :gH 'greet) ; optionally quote to explicitly indicate a function
 ```
 
 ## autocmds
@@ -159,25 +158,43 @@ NOTE:
 <pre lang="clojure"><code>(augroup! {name} {cmds})
 </pre></code>
 
-Defines autocmd group of {name} with {cmds} containing [groups pattern cmd] chunks.
+Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 
-##### Examples:
-- For Vimscript:
+##### Arguments:
+{args} can contain the following values:
 ```clojure
-(local clj "clojure")
-
-(augroup! :greet
-  [[FileType]           clj           "echo hello"]
-  [[BufRead BufNewFile] [*.clj *.fnl] "echo hello"])
+[:nested :once BufRead Filtype ...]
 ```
 
-- For Fennel Functions:
+
+##### Examples:
 ```clojure
-(fn hello [] (print :hello))
+;; -------------------- ;;
+;;      VIMSCRIPT       ;;
+;; -------------------- ;;
+(augroup! :spell
+  [[FileType] [markdown gitcommit] "setlocal spell"])
+
+(augroup! :MkView
+  [[BufWinLeave
+    BufLeave
+    BufWritePost
+    BufHidden
+    QuitPre :nested] ?* "silent! mkview!"]
+  [[BufWinEnter] ?* "silent! loadview"])
+
+
+;; -------------------- ;;
+;;        FENNEL        ;;
+;; -------------------- ;;
+(augroup! :highlight-yank
+  [[TextYankPost] * #(vim.highlight.on_yank {:timeout 80})])
+
+(local greet #(print "Hello World!"))
 
 (augroup! :greet
-  [[BufRead] * 'hello] ; remember to quote functions
-  [[BufRead] * #(print "HOLLA!")])
+  [[BufRead] *.sh '(print :HOLLA)]
+  [[BufRead] *    'hello] ; remember to quote functions to indicate they are callbacks
 ```
 
 ## commands
@@ -188,7 +205,7 @@ Defines autocmd group of {name} with {cmds} containing [groups pattern cmd] chun
 Defines user command {lhs} to {rhs}
 
 ##### Arguments:
-{args} can contain the same opts as `:command`:
+{args} can contain the same opts as `nvim_create_user_command`:
 ```fennel
 [
   :bar      true
@@ -199,60 +216,30 @@ Defines user command {lhs} to {rhs}
   :addr     <string>
   :count    <string>
   :nargs    <string>
-  :complete <string>
+  :complete (or <string> <function>)
 ]
 ```
 
-##### RHS Parameters:
-`:command` parameters like `<bang>` are translated by hibiscus into following table:
-```fennel
-{
-  :bang  <boolean>
-  :qargs <string>
-  :count <number>
-  :lines [<number> <number>]
-}
-```
-They are passed as first argument to lua function, For example:
-```clojure
-(fn example [opts]
-  (print opts.qargs))
-
-(command! [:nargs "*"] :Lhs 'example)
-```
-
 ##### Examples:
-- For Vimscript:
 ```clojure
-(command! [:nargs 1] :Lhs "echo 'hello ' . <q-args>")
-```
+;; -------------------- ;;
+;;      VIMSCRIPT       ;;
+;; -------------------- ;;
+(command! [:range "%"] :Strip "<line1>,<line2>s: \\+$::e")
 
-- For Fennel Functions:
-```clojure
+
+;; -------------------- ;;
+;;        FENNEL        ;;
+;; -------------------- ;;
 (fn greet [opts]
-  (print :hello opts.qargs))
+  (print :hello opts.args))
 
-(command! [:nargs 1] :Lhs 'greet) ; again remember to quote 
+(command! [:nargs 1] :Greet 'greet) ; quoting is optional
 
-(command! [:bang true] :Lhs '(print opts.bang))
-; or
-(command! [:bang true] :Lhs (fn [opts] (print opts.bang)))
+(command! [:bang true] :Lhs #(print $.bang))
 ```
 
 ## misc
-#### vlua
-<pre lang="clojure"><code>(vlua {func})
-</pre></code>
-
-Wraps fennel {func} into valid vimscript cmd
-
-##### Example:
-```clojure
-(local cmd (vlua some-func))
-
-(print cmd) ; -> ":lua _G.hibiscus.store.func()"
-```
-
 #### exec
 <pre lang="clojure"><code>(exec {cmds})
 </pre></code>

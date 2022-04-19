@@ -7,9 +7,16 @@
   "defines function 'name' and exports it to M."
   `(tset M ,(tostring name) (fn ,name ,...)))
 
-(macro lmd [name ...]
+(macro lmd [name args ...]
   "defines lambda function 'name' and exports it to M."
-  `(tset M ,(tostring name) (lambda ,name ,...)))
+  (local asrt [])
+  (each [_ arg (ipairs args)]
+    (if (not= "?" (string.sub (tostring arg) 1 1))
+        (table.insert asrt
+          `(assert-compile (not= ,arg nil) 
+                           (.. "  " ,(tostring name) ": Missing required argument " ,(tostring arg)) ,arg))))
+  `(tset M ,(tostring name)
+           (fn ,name ,args (do ,(unpack asrt)) ,...)))
 
 (lambda set- [name val]
   "sets variable 'name' to 'val' and returns its value."

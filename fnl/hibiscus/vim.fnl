@@ -1,12 +1,11 @@
 (import-macros {
-  : ++
   : or=
-  : string?
+  : ++
+  : inc
   : odd?
   : even?
-  : append
+  : string?
   : tappend
-  : fstring
 } :hibiscus.core)
 
 (local M {})
@@ -14,9 +13,16 @@
 ;; -------------------- ;;
 ;;        UTILS         ;;
 ;; -------------------- ;;
-(macro lmd [name ...]
+(macro lmd [name args ...]
   "defines lambda function 'name' and exports it to M."
-  `(tset M ,(tostring name) (lambda ,name ,...)))
+  (local asrt [])
+  (each [_ arg (ipairs args)]
+    (if (not= "?" (string.sub (tostring arg) 1 1))
+        (table.insert asrt
+          `(assert-compile (not= ,arg nil) 
+                           (.. "  " ,(tostring name) ": Missing required argument " ,(tostring arg)) ,arg))))
+  `(tset M ,(tostring name)
+           (fn ,name ,args (do ,(unpack asrt)) ,...)))
 
 (lambda dolist [lst]
   "unpacks 'lst' and wrap it within do block."
@@ -24,9 +30,36 @@
 
 (lambda parse-sym [xs]
   "parses symbol 'xs' converts it to string if not a variable."
-  (if (or (in-scope? xs) (list? xs)) 
+  (if (or (in-scope? xs) (not (sym? xs)))
       (do xs)
       (tostring xs)))
+
+(lambda parse-list [sx]
+  "parses symbols present in sequence 'sx'."
+  (if (sequence? sx)
+      (vim.tbl_map parse-sym sx)
+      (parse-sym sx)))
+
+
+;; -------------------- ;;
+;;       HELPERS        ;;
+;; -------------------- ;;
+(lambda func? [x]
+  "checks if 'x' is function definition."
+  (let [ref (?. x 1 1)]
+    (or= ref :fn :hashfn :lambda :partial)))
+
+(lambda quote? [x]
+  "checks if 'x' is quoted value."
+  (let [ref (?. x 1 1)]
+    (= ref :quote)))
+
+(lambda parse-cmd [xs ...]
+  "parses command 'xs', wrapping it in function if quoted."
+  (if (quote? xs)
+      (let [ref (. xs 2)]
+        (if (list? ref) `(fn [] ,ref) ref))
+      :else xs))
 
 
 ;; -------------------- ;;
@@ -34,7 +67,7 @@
 ;; -------------------- ;;
 (lmd concat [lst sep]
   "smartly concats all strings in 'lst' with 'sep'."
-  (var out []) 
+  (var out [])
   (var idx 1)
   (each [i v (ipairs lst)]
     ; ignore separator at end
@@ -62,173 +95,94 @@
 
 
 ;; -------------------- ;;
-;;         VLUA         ;;
-;; -------------------- ;;
-(lambda func? [x]
-  "checks if 'x' is function definition."
-  (let [ref (?. x 1 1)]
-    (or= ref :fn :hashfn :lambda :partial)))
-
-(lambda quote? [x]
-  "checks if 'x' is quoted value."
-  (let [ref (?. x 1 1)]
-    (= ref :quote)))
-
-(lambda unquote- [x]
-  "unquotes 'x' wrapping it within a function if required."
-  (local ref (. x 2))
-  (if (list? ref) 
-      (quote (fn [,(sym :opts)] ,ref))
-      (do ref)))
-
-(lambda gen-hash [name]
-  "generates psuedo random hash based on 'name'."
-  (var out 0)
-  (for [i 1 100]
-    (set out (+ out (string.byte name (math.random (# name))))))
-  (each [v (name:gmatch ".")]
-    (set out (+ out (string.byte v))))
-  :return out)
-
-(lambda gen-id [name]
-  "generates random id for vlua functions."
-  (math.randomseed
-    (+ (gen-hash name) (math.random 1000000) (os.time)))
-  (string.gsub "func_xxxxxxxxxx" "x"
-               #(string.format "%x" (math.random 16))))
-
-(lambda store [id func]
-  "globally stores 'func' to 'id' in hibiscus."
-  `(do (if (not _G.hibiscus)
-           (tset _G :hibiscus []))
-       (tset _G.hibiscus ,id ,func)))
-
-(lambda vlua [func args expr? cmd?]
-  "wraps lua 'func' into valid vim cmd, returns (pre cmd) chunks."
-  (local id   (gen-id (tostring func)))
-  (local call (if expr? "v:lua." cmd? "<cmd>lua " ":lua "))
-  (values
-    (store id func)
-    (fstring "${call}_G.hibiscus.${id}${args}")))
-
-(lambda parse-cmd [xs ...]
-  "parses command 'xs', wrapping it with vlua if required."
-  (if (func?  xs) (vlua xs ...)
-      (quote? xs) (vlua (unquote- xs) ...)
-      :else
-      (values nil xs)))
-
-(lambda M.vlua [func ?args]
-  "wraps vlua's return value in do block for user."
-  `(do ,(vlua func (.. "(" (or ?args "") ")") false false)))
-
-
-;; -------------------- ;;
 ;;       MAPPINGS       ;;
 ;; -------------------- ;;
 (lambda parse-map-args [args]
-  "parses map 'args' into (modes opts buf) chunk."
-  (assert (. args 1) 
-          "map: missing required argument 'mode'.")
-  (let [modes (tostring (table.remove args 1))
-        opts  {:noremap true :silent true}]
-    (var buf false)
+  "parses map 'args' into (modes opts) chunk."
+  (let [modes []
+        opts  {:silent true}]
+    ; parse modes
+    (each [mode (string.gmatch (tostring (table.remove args 1)) ".")]
+      (table.insert modes mode))
+    ; parse options
     (each [_ key (ipairs args)]
-      (match key
-        :buffer  (set buf true)
-        :remap   (tset opts :noremap false)
-        :verbose (tset opts :silent false)
-        _        (tset opts key true)))
+      (if (= key :verbose)
+          (tset opts :silent false)
+          (tset opts key true)))
     :return
-    {: modes : opts : buf}))
+    (values modes opts)))
 
 (lmd map! [args lhs rhs]
   "defines vim keymap for modes in 'args'."
-  (local out [])
-  (let [(pre cmd) (if (vim.tbl_contains args :expr) (parse-cmd rhs "()" true false) (parse-cmd rhs "()<CR>" false true))
-        args      (parse-map-args args)]
-    (table.insert out pre)
-    :mapping
-    (each [mode (string.gmatch args.modes ".")]
-      (table.insert out
-        (if args.buf
-            (list `vim.api.nvim_buf_set_keymap 0 mode lhs cmd args.opts)
-            (list `vim.api.nvim_set_keymap       mode lhs cmd args.opts))))
-    :return
-    (dolist out)))
+  (assert-compile (. args 1)
+    "map: missing required argument 'mode'." args)
+  (local (modes opts) (parse-map-args args))
+  :return
+  `(vim.keymap.set ,modes ,lhs ,(parse-cmd rhs) ,opts))
 
 
 ;; -------------------- ;;
 ;;       AUTOCMDS       ;;
 ;; -------------------- ;;
-(lambda parse-pat [pat]
-  "parses augroup pattern 'pat' into a valid string."
-  (if (sequence? pat)
-      (concat (vim.tbl_map parse-sym pat) ",")
-      (parse-sym pat)))
+(lambda parse-callback [cmd]
+  "parses cmd into valid (name callback) chunk for opts in lua api."
+  (if (or (func? cmd) (quote? cmd))
+      (values :callback (parse-cmd cmd))
+      (values :command  (do cmd))))
 
-(lambda parse-autocmd [[groups pattern cmd]]
-  "converts given args into valid autocmd command."
-  (let [groups    (table.concat (vim.tbl_map tostring groups) ",")
-        pattern   (parse-pat pattern)
-        (pre cmd) (parse-cmd cmd "()" false false)]
-    :return
-    (values pre [:au groups pattern cmd])))
+(lambda autocmd [id [events pattern cmd]]
+  "defines autocmd for group of 'id'."
+  ;; parse events
+  (local opts {:once false :nested false})
+  (each [i e (ipairs events)]
+    (when (or= e :once :nested)
+      (tset opts e true)
+      (table.remove events i)))
+  (local events (parse-list events))
+  ;; parse patterns
+  (local pattern
+    (if (sequence? pattern) (parse-list pattern) (parse-sym pattern)))
+  ;; parse callback
+  (local (name val) (parse-callback cmd))
+  :return
+  `(vim.api.nvim_create_autocmd ,events {:once ,opts.once :nested ,opts.nested :group ,id :pattern ,pattern ,name ,val}))
 
 (lmd augroup! [name ...]
   "defines augroup with 'name' and {...} containing [[groups] pat cmd] chunks."
-  (local setup [])
-  (local cmds [
-    [:augroup name]
-    [:au!]
-    [:augroup "END"]
-  ])
-  :autocmd
+  (assert-compile
+    (string? name)
+    (.. "  augroup: invalid name " (view name)) name)
+  ;; define augroup
+  (local id  (gensym :augid))
+  (local out [])
+  (table.insert out `(local ,id (vim.api.nvim_create_augroup ,name {:clear true})))
+  ;; define autocmds
   (each [_ au (ipairs [...])]
-    (local (pre cmd) (parse-autocmd au))
-    (table.insert setup pre)
-    (table.insert cmds (# cmds) cmd))
+    (assert-compile
+      (sequence? au)
+      (.. "  augroup: autocmds expected to be a sequence, got " (view au)) au)
+    (table.insert out (autocmd id au)))
   :return
-  (list `do
-    (dolist setup)
-    (exec cmds)))
+  (dolist out))
 
 
 ;; -------------------- ;;
 ;;       COMMANDS       ;;
 ;; -------------------- ;;
-(local cmd-opts 
-  "{
-     bang  = ('<bang>' == '!'),
-     lines = {<line1>, <line2>},
-     count = <count>,
-     qargs = <q-args>
-  }"
-)
-
 (lambda parse-command-args [args]
-  "converts list of 'args' into string of valid command-opts."
-  (assert (even? (# args))
-          "command: expected even number of values in args.")
-  (var out "")
+  "converts list of 'args' into table of valid command-opts."
+  (assert-compile
+    (even? (# args))
+    "  command: expected even number of values in args." args)
+  (local out {:force true})
   (each [idx val (ipairs args)]
-    (if
-      ; parse keys
-      (odd? idx)
-      (append out (.. "-" val))
-      ; parse values
-      (= true val)
-      (append out " ")
-      :else
-      (append out (.. "=" val " "))))  
+    (if (odd? idx)
+        (tset out val (. args (inc idx)))))
   :return out)
 
 (lmd command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
-  (let [(pre cmd) (parse-cmd rhs (cmd-opts:gsub "\n +" " ") false false)
-        options   (parse-command-args args)]
-    :return
-    `(do ,pre ,(exec [[:command! options lhs cmd]]))))
+  `(vim.api.nvim_create_user_command ,lhs ,(parse-cmd rhs) ,(parse-command-args args)))
 
 
 ;; -------------------- ;;
@@ -243,7 +197,7 @@
       (if (= :no (string.sub name 1 2))
           `(tset vim.opt ,(string.sub name 3) false)
           `(tset vim.opt ,name true))
-      ; else do at runtime
+      ; else at runtime
       `(if (= :no (string.sub ,name 1 2))
            (tset vim.opt (string.sub ,name 3) false)
            (tset vim.opt ,name true))))
