@@ -460,13 +460,18 @@ FSTRING                                                     *hibiscus-fstring*
   wrapper around string.format, works like javascript’s template literates
 
 
+
+- `${...}` is parsed as variable
+- `$(...)` is parsed as fennel code
+
+
 EXAMPLES: ~
 
 >
     (local name "foo")
     (fstring "hello ${name}")
     
-    (fstring "lua expressions also work, like ${{ 2 + 2 }}")
+    (fstring "${name}: two + four is $(+ 2 4).")
 <
 
 

@@ -333,12 +333,15 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > wrapper around string.format, works like javascript's template literates
 
+- `${...}` is parsed as variable
+- `$(...)` is parsed as fennel code
+
 ##### Examples:
 ```clojure
 (local name "foo")
 (fstring "hello ${name}")
 
-(fstring "lua expressions also work, like ${{ 2 + 2 }}")
+(fstring "${name}: two + four is $(+ 2 4).")
 ```
 
 ## pretty print

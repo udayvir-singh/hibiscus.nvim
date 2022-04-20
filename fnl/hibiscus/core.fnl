@@ -1,6 +1,22 @@
 (local M {})
 
 ;; -------------------- ;;
+;;        FENNEL        ;;
+;; -------------------- ;;
+(fn fennel []
+  ; require fennel
+  (var (ok out) (pcall require :tangerine.fennel))
+  (if ok
+    (set out (out.load))
+    (set (ok out) (pcall require :fennel)))
+  ; assert
+  (assert-compile ok
+    (.. "  hibiscus: module for \34fennel\34 not found.\n\n"
+        "    * install fennel globally or install tangerine.nvim."))
+  :return out)
+
+
+;; -------------------- ;;
 ;;        UTILS         ;;
 ;; -------------------- ;;
 (macro fun [name ...]
@@ -46,24 +62,21 @@
 ;; -------------------- ;;
 ;;       FSTRING        ;;
 ;; -------------------- ;;
-(lambda gen-var [expr]
-  "generates variable from lua 'expr'."
-  (local symbol (gensym :fstring_var))
-  :return
-  `(let [,symbol nil]
-     (lua ,(.. (tostring symbol) "=" expr))
-     ,symbol))
+(lmd ast [expr]
+  "parses fennel 'expr' into ast."
+  (local (ok out)
+         (((. (fennel) :parser) expr "fstring")))
+  :return out)
 
 (lmd fstring [str]
   "wrapper around string.format, works like javascript's template literates."
   (local args [])
-  (each [xs (str:gmatch "$({{?.-}}?)")]
-        (if (xs:find "^{[^{]")
-            (table.insert args (sym (xs:match "^{(.+)}$")))
-            :else
-            (table.insert args (gen-var (xs:match "^{{(.+)}}$")))))
+  (each [xs (str:gmatch "$([({].-[})])")]
+    (if (xs:find "^{")
+        (table.insert args (sym (xs:match "^{(.+)}$")))
+        (table.insert args (ast xs))))
   :return
-  `(string.format ,(str:gsub "${{?.-}}?" "%%s") ,(unpack args)))
+  `(string.format ,(str:gsub "$[({].-[})]" "%%s") ,(unpack args)))
 
 
 ;; -------------------- ;;
