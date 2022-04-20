@@ -163,7 +163,7 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 ##### Arguments:
 {args} can contain the following values:
 ```clojure
-[:nested :once BufRead Filtype ...]
+[ :nested :once BufRead Filetype ...etc ]
 ```
 
 
@@ -208,11 +208,11 @@ Defines user command {lhs} to {rhs}
 {args} can contain the same opts as `nvim_create_user_command`:
 ```fennel
 [
-  :bar      true
-  :bang     true
-  :buffer   true
-  :register true
-  :range    (or true <string>)
+  :bar      <boolean>
+  :bang     <boolean>
+  :buffer   <boolean>
+  :register <boolean>
+  :range    (or <boolean> <string>)
   :addr     <string>
   :count    <string>
   :nargs    <string>
@@ -234,7 +234,7 @@ Defines user command {lhs} to {rhs}
 (fn greet [opts]
   (print :hello opts.args))
 
-(command! [:nargs 1] :Greet 'greet) ; quoting is optional
+(command! [:nargs 1 :complete #["world"]] :Greet 'greet) ; quoting is optional
 
 (command! [:bang true] :Lhs #(print $.bang))
 ```
@@ -450,7 +450,7 @@ Sets buffer scoped variable {name} to {val}.
 ```clojure
 (merge-list {list1} {list2})
 ```
-> merges all values of {list1} and {list2} together.
+> merges all values of {list1} and {list2} together
 
 ```clojure
 (merge {tbl1} {tbl2})
