@@ -30,7 +30,7 @@
     (if (not= "?" (string.sub (tostring arg) 1 1))
         (table.insert asrt
           `(assert-compile (not= ,arg nil) 
-                           (.. "  " ,(tostring name) ": Missing required argument " ,(tostring arg)) ,arg))))
+                           (.. "  " ,(tostring name) ": Missing required argument '" ,(tostring arg) "'.") ,arg))))
   `(tset M ,(tostring name)
            (fn ,name ,args (do ,(unpack asrt)) ,...)))
 
@@ -71,12 +71,12 @@
 (lmd fstring [str]
   "wrapper around string.format, works like javascript's template literates."
   (local args [])
-  (each [xs (str:gmatch "$([({].-[})])")]
+  (each [xs (str:gmatch "$([({][^$]+[})])")]
     (if (xs:find "^{")
         (table.insert args (sym (xs:match "^{(.+)}$")))
         (table.insert args (ast xs))))
   :return
-  `(string.format ,(str:gsub "$[({].-[})]" "%%s") ,(unpack args)))
+  `(string.format ,(str:gsub "$[({][^$]+[})]" "%%s") ,(unpack args)))
 
 
 ;; -------------------- ;;
