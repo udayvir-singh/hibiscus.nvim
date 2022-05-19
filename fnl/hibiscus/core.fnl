@@ -194,9 +194,9 @@
 (fun dump [...]
   "pretty prints {...} into human readable form."
   `(let [out# []]
-     (each [# v# (ipairs [,...])]
-       (if (?. _G.tangerine :api :serialize)
-           (table.insert out# [(_G.tangerine.api.serialize v#)])
+     (if (?. _G.tangerine :api :serialize)
+         (table.insert out# [(_G.tangerine.api.serialize ,...)])
+         (each [# v# (ipairs [,...])]
            (table.insert out# [(vim.inspect v#)])))
      (vim.api.nvim_echo out# false [])))
 
