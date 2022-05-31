@@ -106,7 +106,7 @@
   "checks if 'x' is mathematically of even parity ;}"
   `(and ,(number? x) (= 0 (% ,x 2))))
 
-(fun function? [x]
+(fun fn? [x]
   "checks if 'x' is of function type."
   `(= :function (type ,x)))
 

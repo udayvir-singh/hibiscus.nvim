@@ -553,7 +553,7 @@ CHECKING                                                   *hibiscus-checking*
 
 
 >
-    (function? {x})
+    (fn? {x})
 <
 
 

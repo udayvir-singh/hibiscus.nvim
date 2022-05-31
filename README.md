@@ -387,7 +387,7 @@ Sets buffer scoped variable {name} to {val}.
 > checks if {int} is of even parity
 
 ```clojure
-(function? {x})
+(fn? {x})
 ```
 > checks if {x} is of function type
 
