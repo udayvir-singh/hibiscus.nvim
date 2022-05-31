@@ -117,10 +117,11 @@ Much more lisp friendly wrapper over packer.use function.
 
 ## keymaps
 #### map!
-<pre lang="clojure"><code>(map! {args} {lhs} {rhs})
+<pre lang="clojure"><code>(map! {args} {lhs} {rhs} {desc})
 </pre></code>
 
-Defines vim keymap for the given modes from {lhs} to {rhs}
+Defines vim keymap for the given modes from {lhs} to {rhs} with an optional
+description of {desc}
 
 ##### Arguments:
 {args} can contain the following values:
@@ -149,7 +150,7 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 
 (local greet #(print "Hello World!"))
 
-(map! [n] :gH 'greet) ; optionally quote to explicitly indicate a function
+(map! [n] :gH 'greet "Give Greeting") ; optionally quote to explicitly indicate a function
 ```
 
 ## autocmds
