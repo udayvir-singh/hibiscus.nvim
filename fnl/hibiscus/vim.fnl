@@ -19,7 +19,7 @@
   (each [_ arg (ipairs args)]
     (if (not= "?" (string.sub (tostring arg) 1 1))
         (table.insert asrt
-          `(assert-compile (not= ,arg nil) 
+          `(assert-compile (not= ,arg nil)
                            (.. "  " ,(tostring name) ": Missing required argument '" ,(tostring arg) "'.") ,arg))))
   `(tset M ,(tostring name)
            (fn ,name ,args (do ,(unpack asrt)) ,...)))
@@ -79,7 +79,7 @@
         :else
         (do (tset out (++ idx) `(.. ,v ,sep))
             (++ idx))))
-  :return 
+  :return
   (if (= idx 1)
       (unpack out)
       (list `.. (unpack out))))
@@ -112,11 +112,12 @@
     :return
     (values modes opts)))
 
-(lmd map! [args lhs rhs]
+(lmd map! [args lhs rhs ?desc]
   "defines vim keymap for modes in 'args'."
   (assert-compile (. args 1)
     "map: missing required argument 'mode'." args)
   (local (modes opts) (parse-map-args args))
+  (set opts.desc ?desc)
   :return
   `(vim.keymap.set ,modes ,lhs ,(parse-cmd rhs) ,opts))
 

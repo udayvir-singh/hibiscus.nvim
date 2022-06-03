@@ -32,7 +32,7 @@ uninstall:
 # ------------------- #
 define HELP
 | Usage: make [target] ...
-| 
+|
 | Targets:
 |   :vimdoc              runs panvimdoc to generate vimdocs
 |   :install             install macros inside plugin dir
@@ -45,4 +45,3 @@ help:
 	else
 		echo "$(HELP)" | sed "s:^| ::"
 	fi
-
