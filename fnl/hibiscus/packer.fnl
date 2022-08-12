@@ -46,9 +46,11 @@
   (each [idx val (ipairs opts)]
     (local nval (. opts (+ idx 1)))
     (if (odd? idx)
-        (match val
-          :module (tset out :config `#(require ,nval))
-          _       (tset out val nval))))
+        (tset out val nval)))
+  ; parse module option
+  (when out.module
+    (set out.config `(fn [] (require ,out.module) ,(and out.config `(,out.config))))
+    (set out.module nil))
   :return out)
 
 
