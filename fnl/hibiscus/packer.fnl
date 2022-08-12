@@ -11,8 +11,8 @@
         path (.. (vim.fn.stdpath :data) "/site/pack/packer/start/packer.nvim") ]
     `(when (= 0 (vim.fn.isdirectory ,path))
        (print "packer.nvim: installing in data dir...")
-       (tset _G :packer_bootstrap
-             (vim.fn.system [:git :clone "--depth" "1" ,url ,path]))
+       (and (vim.fn.system [:git :clone "--depth" "1" ,url ,path])
+            (tset _G :packer_bootstrap true))
        (vim.cmd :redraw)
        (vim.cmd "packadd packer.nvim")
        (print "packer.nvim: installed"))))
@@ -26,14 +26,14 @@
 ;; -------------------- ;;
 ;;       STARTUP        ;;
 ;; -------------------- ;;
-(lambda M.packer [...]
+(fn M.packer [...]
   "syntactic sugar over packer's startup function."
   (local packer `(require :packer))
   `((. ,packer :startup)
     (lambda [(unquote (sym :use))]
       (use :wbthomason/packer.nvim)
       (do ,...)
-      (if _G.packer_bootstrap
+      (if (= true _G.packer_bootstrap)
           ((. ,packer :sync))))))
 
 
@@ -44,15 +44,14 @@
   "parses 'name' and list of 'opts' into valid packer.use args."
   (local out [name])
   (each [idx val (ipairs opts)]
-    (local nval (. opts (+ idx 1)))
+    (local next-val (. opts (+ idx 1)))
     (if (odd? idx)
-        (tset out val nval)))
+        (tset out val next-val)))
   ; parse module option
   (when out.module
-    (set out.config `(fn [] (require ,out.module) ,(and out.config `(,out.config))))
-    (set out.module nil))
+    (tset out :config `(fn [] (require ,out.module) ,(and out.config `(,out.config))))
+    (tset out :module nil))
   :return out)
-
 
 (lambda M.use! [name ...]
   "syntactic sugar over packer's use function."

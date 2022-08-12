@@ -1,12 +1,4 @@
-(import-macros {
-  : or=
-  : ++
-  : inc
-  : odd?
-  : even?
-  : string?
-  : tappend
-} :hibiscus.core)
+(import-macros {: or= : ++ : inc : odd? : even? : string? : tappend} :hibiscus.core)
 
 (local M {})
 
@@ -71,8 +63,7 @@
   (var idx 1)
   (each [i v (ipairs lst)]
     ; ignore separator at end
-    (local sep
-           (if (< i (# lst)) sep ""))
+    (local sep (if (< i (# lst)) sep ""))
     ; concat string
     (if (string? v)
         (tappend out idx (.. v sep))
@@ -133,17 +124,17 @@
 
 (lambda autocmd [id [events pattern cmd]]
   "defines autocmd for group of 'id'."
-  ;; parse events
+  ; parse events
   (local opts {:once false :nested false})
   (each [i e (ipairs events)]
     (when (or= e :once :nested)
       (tset opts e true)
       (table.remove events i)))
   (local events (parse-list events))
-  ;; parse patterns
+  ; parse patterns
   (local pattern
     (if (sequence? pattern) (parse-list pattern) (parse-sym pattern)))
-  ;; parse callback
+  ; parse callback
   (local (name val) (parse-callback cmd))
   :return
   `(vim.api.nvim_create_autocmd ,events {:once ,opts.once :nested ,opts.nested :group ,id :pattern ,pattern ,name ,val}))
@@ -153,11 +144,11 @@
   (assert-compile
     (string? name)
     (.. "  augroup: invalid name " (view name)) name)
-  ;; define augroup
+  ; define augroup
   (local id  (gensym :augid))
   (local out [])
   (table.insert out `(local ,id (vim.api.nvim_create_augroup ,name {:clear true})))
-  ;; define autocmds
+  ; define autocmds
   (each [_ au (ipairs [...])]
     (assert-compile
       (sequence? au)
@@ -198,7 +189,7 @@
       (if (= :no (string.sub name 1 2))
           `(tset vim.opt ,(string.sub name 3) false)
           `(tset vim.opt ,name true))
-      ; else at runtime
+      ; else compute at runtime
       `(if (= :no (string.sub ,name 1 2))
            (tset vim.opt (string.sub ,name 3) false)
            (tset vim.opt ,name true))))
