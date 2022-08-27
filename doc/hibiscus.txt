@@ -236,7 +236,7 @@ ARGUMENTS: ~
 {args} can contain the following values:
 
 >
-    [ :nested :once BufRead Filetype ...etc ]
+    [ :nested :once :desc <desc> BufRead Filetype ...etc ]
 <
 
 
@@ -262,7 +262,8 @@ EXAMPLES: ~
     ;;        FENNEL        ;;
     ;; -------------------- ;;
     (augroup! :highlight-yank
-      [[TextYankPost] * #(vim.highlight.on_yank {:timeout 80})])
+      [[TextYankPost :desc "highlights yanked region."]
+       * #(vim.highlight.on_yank {:timeout 80})])
     
     (local greet #(print "Hello World!"))
     

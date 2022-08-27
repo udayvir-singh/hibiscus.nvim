@@ -163,7 +163,7 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 ##### Arguments:
 {args} can contain the following values:
 ```clojure
-[ :nested :once BufRead Filetype ...etc ]
+[ :nested :once :desc <desc> BufRead Filetype ...etc ]
 ```
 
 
@@ -188,7 +188,8 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 ;;        FENNEL        ;;
 ;; -------------------- ;;
 (augroup! :highlight-yank
-  [[TextYankPost] * #(vim.highlight.on_yank {:timeout 80})])
+  [[TextYankPost :desc "highlights yanked region."]
+   * #(vim.highlight.on_yank {:timeout 80})])
 
 (local greet #(print "Hello World!"))
 

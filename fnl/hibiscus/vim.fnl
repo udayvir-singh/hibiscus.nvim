@@ -1,4 +1,4 @@
-(import-macros {: or= : ++ : inc : odd? : even? : string? : tappend} :hibiscus.core)
+(import-macros {: or= : ++ : inc : odd? : even? : string? : tappend : merge} :hibiscus.core)
 
 (local M {})
 
@@ -124,20 +124,34 @@
 
 (lambda autocmd [id [events pattern cmd]]
   "defines autocmd for group of 'id'."
-  ; parse events
-  (local opts {:once false :nested false})
+  ; parse opts
+  (local opts {})
+  (local rem  [])
   (each [i e (ipairs events)]
     (when (or= e :once :nested)
       (tset opts e true)
-      (table.remove events i)))
-  (local events (parse-list events))
+      (table.insert rem i))
+    (when (= e :desc)
+      (local arg (. events (inc i)))
+      (assert-compile (= :string (type arg))
+        "  missing argument to desc option in augroup!." events)
+      (tset opts e arg)
+      (table.insert rem i)
+      (table.insert rem (inc i))))
+  (each [_ i (ipairs rem)]
+    (tset events i nil))
+  ; parse events
+  (local e* [])
+  (each [_ v (pairs events)]
+    (table.insert e* (parse-sym v)))
+  (local events e*)
   ; parse patterns
   (local pattern
     (if (sequence? pattern) (parse-list pattern) (parse-sym pattern)))
   ; parse callback
   (local (name val) (parse-callback cmd))
   :return
-  `(vim.api.nvim_create_autocmd ,events {:once ,opts.once :nested ,opts.nested :group ,id :pattern ,pattern ,name ,val}))
+  `(vim.api.nvim_create_autocmd ,events ,(merge opts {:group id :pattern pattern name val})))
 
 (lmd augroup! [name ...]
   "defines augroup with 'name' and {...} containing [[groups] pat cmd] chunks."
