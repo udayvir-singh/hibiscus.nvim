@@ -180,19 +180,41 @@
 ;; -------------------- ;;
 ;;       OPTIONS        ;;
 ;; -------------------- ;;
-(lmd set! [name ?val]
-  "sets vim option 'name', optionally taking 'val'."
+(lambda option-setter [method name ?val]
+  "sets vim 'option' name on 'method'."
   (local name (parse-sym name))
   (if (not= nil ?val)
       `(tset vim.opt ,name ,?val)
       (string? name)
       (if (= :no (string.sub name 1 2))
-          `(tset vim.opt ,(string.sub name 3) false)
-          `(tset vim.opt ,name true))
+          '(tset ,method ,(string.sub name 3) false)
+          '(tset ,method ,name true))
       ; else compute at runtime
       `(if (= :no (string.sub ,name 1 2))
-           (tset vim.opt (string.sub ,name 3) false)
-           (tset vim.opt ,name true))))
+           (tset ,method (string.sub ,name 3) false)
+           (tset ,method ,name true))))
+
+(lmd set! [name ?val]
+  "sets vim option 'name'."
+  (option-setter 'vim.o name ?val))
+
+(lmd setlocal! [name ?val]
+  "sets local vim option 'name'."
+  (local name (parse-sym name))
+  (if (string? name)
+      (let [name* (string.gsub name "^no" "")
+            info  (vim.api.nvim_get_option_info name*)
+            scope (. info "scope")]
+        (if (= scope :buf)
+            (option-setter 'vim.bo name ?val)
+            (option-setter 'vim.wo name ?val)))
+      ; else compute at runtime
+      '(let [name#  (string.gsub ,name "^no" "")
+             info#  (vim.api.nvim_get_option_info name#)
+             scope# (. info# "scope")]
+         (if (= scope# :buf)
+             ,(option-setter 'vim.bo name ?val)
+             ,(option-setter 'vim.wo name ?val)))))
 
 (lmd set+ [name val]
   "appends 'val' to vim option 'name'."

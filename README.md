@@ -278,6 +278,13 @@ Works like command `:set`, sets vim option {name} to {val}
       (set! opt true))
 ```
 
+#### setlocal!
+Works like command `:setlocal`, sets local vim option {name} to {val}
+```clojure
+(setlocal! filetype "md")
+(setlocal! number)
+```
+
 #### set+
 Appends {val} to string-style option {name}
 

@@ -373,6 +373,18 @@ set!                                   Works like command `:set`, sets vim
 <
 
 
+                                                          *hibiscus-setlocal!*
+
+setlocal!                              Works like command `:setlocal`, sets
+                                       local vim option {name} to {val}
+
+
+>
+    (setlocal! filetype "md")
+    (setlocal! number)
+<
+
+
                                                                *hibiscus-set+*
 
 set+                                   Appends {val} to string-style option
