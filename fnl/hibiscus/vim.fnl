@@ -198,7 +198,7 @@
   "sets vim 'option' name on 'method'."
   (local name (parse-sym name))
   (if (not= nil ?val)
-      `(tset vim.opt ,name ,?val)
+      `(tset ,method ,name ,?val)
       (string? name)
       (if (= :no (string.sub name 1 2))
           '(tset ,method ,(string.sub name 3) false)
