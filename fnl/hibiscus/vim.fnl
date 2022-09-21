@@ -26,11 +26,18 @@
       (do xs)
       (tostring xs)))
 
-(lambda parse-list [sx]
-  "parses symbols present in sequence 'sx'."
-  (if (sequence? sx)
-      (vim.tbl_map parse-sym sx)
-      (parse-sym sx)))
+(lambda parse-list [sq]
+  "parses symbols present in sequence 'sq'."
+  (vim.tbl_map parse-sym sq))
+
+(lambda list-remove [lst idxs]
+  "remove values on 'idxs' from 'lst'."
+  (local out [])
+  (each [_ idx (ipairs idxs)]
+    (tset lst idx nil))
+  (each [_ val (pairs lst)]
+    (table.insert out val))
+  :return out)
 
 
 ;; -------------------- ;;
@@ -116,42 +123,44 @@
 ;; -------------------- ;;
 ;;       AUTOCMDS       ;;
 ;; -------------------- ;;
-(lambda parse-callback [cmd]
-  "parses cmd into valid (name callback) chunk for opts in lua api."
+(lambda parse-pattern [opts pattern]
+  (if ; parse buffer pattern
+      (and (quote? pattern)
+           (= (?. pattern 2 1 1) :buffer))
+      (tset opts :buffer (or (?. pattern 2 2) 0))
+      ; parse list of patterns
+      (sequence? pattern)
+      (tset opts :pattern (parse-list pattern))
+      ; parse single pattern
+      (tset opts :pattern (parse-sym pattern))))
+
+(lambda parse-callback [opts cmd]
   (if (or (func? cmd) (quote? cmd))
-      (values :callback (parse-cmd cmd))
-      (values :command  (do cmd))))
+      (tset opts :callback (parse-cmd cmd))
+      (tset opts :command  cmd)))
 
 (lambda autocmd [id [events pattern cmd]]
   "defines autocmd for group of 'id'."
   ; parse opts
-  (local opts {})
-  (local rem  [])
+  (local opts {:group id})
+  (parse-pattern  opts pattern)
+  (parse-callback opts cmd)
+  ; parse events
+  (local rem [])
   (each [i e (ipairs events)]
     (when (or= e :once :nested)
       (tset opts e true)
       (table.insert rem i))
     (when (= e :desc)
-      (local arg (. events (inc i)))
-      (assert-compile (= :string (type arg))
+      (local desc (. events (inc i)))
+      (assert-compile (= :string (type desc))
         "  missing argument to desc option in augroup!." events)
-      (tset opts e arg)
+      (tset opts :desc desc)
       (table.insert rem i)
       (table.insert rem (inc i))))
-  (each [_ i (ipairs rem)]
-    (tset events i nil))
-  ; parse events
-  (local e* [])
-  (each [_ v (pairs events)]
-    (table.insert e* (parse-sym v)))
-  (local events e*)
-  ; parse patterns
-  (local pattern
-    (if (sequence? pattern) (parse-list pattern) (parse-sym pattern)))
-  ; parse callback
-  (local (name val) (parse-callback cmd))
+  (local events (parse-list (list-remove events rem)))
   :return
-  `(vim.api.nvim_create_autocmd ,events ,(merge opts {:group id :pattern pattern name val})))
+  `(vim.api.nvim_create_autocmd ,events ,opts))
 
 (lmd augroup! [name ...]
   "defines augroup with 'name' and {...} containing [[groups] pat cmd] chunks."

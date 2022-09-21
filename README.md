@@ -183,6 +183,9 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
     QuitPre :nested] ?* "silent! mkview!"]
   [[BufWinEnter] ?* "silent! loadview"])
 
+(augroup! :buffer-local
+  [[Event] '(buffer 0) "echo 'hello'"])
+
 
 ;; -------------------- ;;
 ;;        FENNEL        ;;

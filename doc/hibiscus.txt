@@ -257,6 +257,9 @@ EXAMPLES: ~
         QuitPre :nested] ?* "silent! mkview!"]
       [[BufWinEnter] ?* "silent! loadview"])
     
+    (augroup! :buffer-local
+      [[Event] '(buffer 0) "echo 'hello'"])
+    
     
     ;; -------------------- ;;
     ;;        FENNEL        ;;
