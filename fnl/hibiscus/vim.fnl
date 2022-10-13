@@ -219,7 +219,7 @@
 
 (lmd set! [name ?val]
   "sets vim option 'name'."
-  (option-setter 'vim.o name ?val))
+  (option-setter 'vim.opt name ?val))
 
 (lmd setlocal! [name ?val]
   "sets local vim option 'name'."
