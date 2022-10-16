@@ -1,48 +1,28 @@
+(require-macros :hibiscus.utils)
+
 (local M {})
 
 ;; -------------------- ;;
-;;        FENNEL        ;;
+;;        UTILS         ;;
 ;; -------------------- ;;
-(fn fennel []
-  ; require fennel
+(fn require-fennel []
   (var (ok out) (pcall require :tangerine.fennel))
   (if ok
     (set out (out.load))
     (set (ok out) (pcall require :fennel)))
-  ; assert
+  ; assert for fennel
   (assert-compile ok
     (.. "  hibiscus: module for \34fennel\34 not found.\n\n"
         "    * install fennel globally or install tangerine.nvim."))
   :return out)
 
-
-;; -------------------- ;;
-;;        UTILS         ;;
-;; -------------------- ;;
-(macro fun [name ...]
-  "defines function 'name' and exports it to M."
-  `(tset M ,(tostring name) (fn ,name ,...)))
-
-(macro lmd [name args ...]
-  "defines lambda function 'name' and exports it to M."
-  (local asrt [])
-  (each [_ arg (ipairs args)]
-    (if (not= "?" (string.sub (tostring arg) 1 1))
-        (table.insert asrt
-          `(assert-compile (not= ,arg nil)
-                           (.. "  " ,(tostring name) ": Missing required argument '" ,(tostring arg) "'.") ,arg))))
-  `(tset M ,(tostring name)
-           (fn ,name ,args (do ,(unpack asrt)) ,...)))
-
 (lambda set- [name val]
   "sets variable 'name' to 'val' and returns its value."
-  `(do (set-forcibly! ,name ,val)
-       :return ,name))
+  `(do (set-forcibly! ,name ,val) ,name))
 
 (lambda tset- [tbl key val]
   "sets 'key' in 'tbl' to 'val' and returns its value."
-  `(do (tset ,tbl ,key ,val)
-       :return (. ,tbl ,key)))
+  `(do (tset ,tbl ,key ,val) (. ,tbl ,key)))
 
 
 ;; -------------------- ;;
@@ -62,14 +42,15 @@
 ;; -------------------- ;;
 ;;       FSTRING        ;;
 ;; -------------------- ;;
-(lmd ast [expr]
+(lun ast [expr]
   "parses fennel 'expr' into ast."
   (local (ok out)
-         (((. (fennel) :parser) expr "fstring")))
+         (((. (require-fennel) :parser) expr "fstring")))
   :return out)
 
-(lmd fstring [str]
+(lun fstring [str]
   "wrapper around string.format, works like javascript's template literates."
+  (check [:string str])
   (local args [])
   (each [xs (str:gmatch "$([({][^$]+[})])")]
     (if (xs:find "^{")
@@ -120,26 +101,25 @@
 
 (fun empty? [tbl]
   "checks if 'tbl' is empty."
-  `(and ,(table? tbl)
-        (= 0 (length ,tbl))))
+  `(and ,(table? tbl) (= 0 (length ,tbl))))
 
 
 ;; -------------------- ;;
 ;;        NUMBER        ;;
 ;; -------------------- ;;
-(lmd inc [int]
+(lun inc [int]
   "increments 'int' by 1."
   `(+ ,int 1))
 
-(lmd ++ [v]
+(lun ++ [v]
   "increments variable 'v' by 1."
   (set- v (inc v)))
 
-(lmd dec [int]
+(lun dec [int]
   "decrements 'int' by 1."
   `(- ,int 1))
 
-(lmd -- [v]
+(lun -- [v]
   "decrements variable 'v' by 1."
   (set- v (dec v)))
 
@@ -147,19 +127,21 @@
 ;; -------------------- ;;
 ;;        STRING        ;;
 ;; -------------------- ;;
-(lmd append [v str]
+(lun append [v str]
   "appends 'str' to variable 'v'."
+  (check [:sym (as var v)])
   (set- v (list `.. v str)))
 
-(lmd tappend [tbl key str]
+(lun tappend [tbl key str]
   "appends 'str' to 'key' of table 'tbl'."
   (tset- tbl key `(.. (or (. ,tbl ,key) "") ,str)))
 
-(lmd prepend [v str]
+(lun prepend [v str]
   "prepends 'str' to variable 'v'."
+  (check [:sym (as var v)])
   (set- v (list `.. str v)))
 
-(lmd tprepend [tbl key str]
+(lun tprepend [tbl key str]
   "prepends 'str' to 'key' of table 'tbl'."
   (tset- tbl key `(.. ,str (or (. ,tbl ,key) ""))))
 
@@ -167,24 +149,35 @@
 ;; -------------------- ;;
 ;;        TABLE         ;;
 ;; -------------------- ;;
-(lmd merge-list [list1 list2]
+(lun merge-list [list1 list2]
   "merges all values of 'list1' and 'list2' together."
-  `(let [out# []]
-     (each [# v# (ipairs ,list1)]
-           (table.insert out# v#))
-     (each [# v# (ipairs ,list2)]
+  `(let [out# (vim.deepcopy ,list1)]
+     (each [# v# (ipairs (vim.deepcopy ,list2))]
            (table.insert out# v#))
      :return out#))
 
-(lmd merge [tbl1 tbl2]
+(lun merge-tbl [tbl1 tbl2]
+  "merges 'tbl2' onto 'tbl1'."
+  `(do
+   (fn m# [x# y#]
+     (local out# (vim.deepcopy x#))
+     (each [k# v# (pairs (vim.deepcopy y#))]
+       (if (= :table (type v#) (type (. out# k#)))
+           (tset out# k# (m# (. out# k#) v#))
+           (tset out# k# v#)))
+     :return out#)
+   (m# ,tbl1 ,tbl2)))
+
+(lun merge [tbl1 tbl2]
   "merges 'tbl2' onto 'tbl1', correctly appending lists."
   `(if (and ,(seq? tbl1) ,(seq? tbl2))
        ,(merge-list tbl1 tbl2)
        :else
-       (vim.tbl_deep_extend "force" ,tbl1 ,tbl2)))
+       ,(merge-tbl tbl1 tbl2)))
 
-(lmd merge! [v tbl]
+(lun merge! [v tbl]
   "merges 'tbl' onto variable 'v'."
+  (check [:sym (as var v)])
   (set- v (M.merge v tbl)))
 
 

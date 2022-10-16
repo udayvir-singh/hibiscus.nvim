@@ -1,3 +1,4 @@
+(require-macros :hibiscus.utils)
 (require-macros :hibiscus.core)
 
 (local M {})
@@ -17,7 +18,7 @@
        (vim.cmd "packadd packer.nvim")
        (print "packer.nvim: installed"))))
 
-(fn M.packer-setup [opts]
+(fun packer-setup [opts]
   "bootstraps and setups config of packer with 'opts'."
   `(do ,(bootstrap)
        ((. (require :packer) :init) ,(or opts {}))))
@@ -26,7 +27,7 @@
 ;; -------------------- ;;
 ;;       STARTUP        ;;
 ;; -------------------- ;;
-(fn M.packer [...]
+(fun packer [...]
   "syntactic sugar over packer's startup function."
   (local packer `(require :packer))
   `((. ,packer :startup)
@@ -53,14 +54,10 @@
     (tset out :module nil))
   :return out)
 
-(lambda M.use! [name ...]
+(lun use! [name ...]
   "syntactic sugar over packer's use function."
-  (assert-compile
-    (string? name)
-    (.. "  packer-use: invalid name " (view name)) name)
-  (assert-compile
-    (even? (# [...]))
-    (.. "  packer-use: error in :" name ", opts must contain even number of key-value pairs."))
+  (check [:string name
+          :even   (as options (# [...]))])
   :return
   `(use ,(parse-conf name [...])))
 

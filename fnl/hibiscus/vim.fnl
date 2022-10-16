@@ -1,3 +1,4 @@
+(require-macros :hibiscus.utils)
 (require-macros :hibiscus.core)
 
 (local M {})
@@ -5,16 +6,15 @@
 ;; -------------------- ;;
 ;;        UTILS         ;;
 ;; -------------------- ;;
-(macro lmd [name args ...]
-  "defines lambda function 'name' and exports it to M."
-  (local asrt [])
-  (each [_ arg (ipairs args)]
-    (if (not= "?" (string.sub (tostring arg) 1 1))
-        (table.insert asrt
-          `(assert-compile (not= ,arg nil)
-                           (.. "  " ,(tostring name) ": Missing required argument '" ,(tostring arg) "'.") ,arg))))
-  `(tset M ,(tostring name)
-           (fn ,name ,args (do ,(unpack asrt)) ,...)))
+(lambda func? [x]
+  "checks if 'x' is function definition."
+  (let [ref (?. x 1 1)]
+    (or= ref :fn :hashfn :lambda :partial)))
+
+(lambda quote? [x]
+  "checks if 'x' is quoted value."
+  (let [ref (?. x 1 1)]
+    (= ref :quote)))
 
 (lambda dolist [lst]
   "unpacks 'lst' and wrap it within do block."
@@ -30,6 +30,13 @@
   "parses symbols present in sequence 'sq'."
   (vim.tbl_map parse-sym sq))
 
+(lambda parse-cmd [xs ...]
+  "parses command 'xs', wrapping it in function if quoted."
+  (if (quote? xs)
+      (let [ref (. xs 2)]
+        (if (list? ref) `(fn [] ,ref) ref))
+      :else xs))
+
 (lambda list-remove [lst idxs]
   "remove values on 'idxs' from 'lst'."
   (local out [])
@@ -41,49 +48,30 @@
 
 
 ;; -------------------- ;;
-;;       HELPERS        ;;
-;; -------------------- ;;
-(lambda func? [x]
-  "checks if 'x' is function definition."
-  (let [ref (?. x 1 1)]
-    (or= ref :fn :hashfn :lambda :partial)))
-
-(lambda quote? [x]
-  "checks if 'x' is quoted value."
-  (let [ref (?. x 1 1)]
-    (= ref :quote)))
-
-(lambda parse-cmd [xs ...]
-  "parses command 'xs', wrapping it in function if quoted."
-  (if (quote? xs)
-      (let [ref (. xs 2)]
-        (if (list? ref) `(fn [] ,ref) ref))
-      :else xs))
-
-
-;; -------------------- ;;
 ;;       GENERAL        ;;
 ;; -------------------- ;;
-(lmd concat [lst sep]
+(lun concat [lst sep]
   "smartly concats all strings in 'lst' with 'sep'."
+  (check [:seq lst :string sep])
   (var out [])
-  (var idx 1)
+  (var len 1)
   (each [i v (ipairs lst)]
     ; ignore separator at end
     (local sep (if (< i (# lst)) sep ""))
     ; concat string
     (if (string? v)
-        (tappend out idx (.. v sep))
+        (tappend out len (.. v sep))
         :else
-        (do (tset out (++ idx) `(.. ,v ,sep))
-            (++ idx))))
+        (do (tset out (++ len) `(.. ,v ,sep))
+            (++ len))))
   :return
-  (if (= idx 1)
+  (if (= len 1)
       (unpack out)
       (list `.. (unpack out))))
 
-(lmd exec [cmds]
+(lun exec [cmds]
   "wraps [cmd] chunks in 'cmds' within vim.cmd block."
+  (check [:seq cmds])
   (local out [])
   (each [_ cmd (ipairs cmds)]
         (table.insert out `(vim.cmd ,(concat cmd " "))))
@@ -110,10 +98,10 @@
     :return
     (values modes opts)))
 
-(lmd map! [args lhs rhs ?desc]
+(lun map! [args lhs rhs ?desc]
   "defines vim keymap for modes in 'args'."
-  (assert-compile (. args 1)
-    "map: missing required argument 'mode'." args)
+  (check [:real   (as mode (. args 1))
+          :string (as description (or ?desc ""))])
   (local (modes opts) (parse-map-args args))
   (set opts.desc ?desc)
   :return
@@ -162,20 +150,16 @@
   :return
   `(vim.api.nvim_create_autocmd ,events ,opts))
 
-(lmd augroup! [name ...]
+(lun augroup! [name ...]
   "defines augroup with 'name' and {...} containing [[groups] pat cmd] chunks."
-  (assert-compile
-    (string? name)
-    (.. "  augroup: invalid name " (view name)) name)
+  (check [:string name])
   ; define augroup
   (local id  (gensym :augid))
   (local out [])
   (table.insert out `(local ,id (vim.api.nvim_create_augroup ,name {:clear true})))
   ; define autocmds
   (each [_ au (ipairs [...])]
-    (assert-compile
-      (sequence? au)
-      (.. "  augroup: autocmds expected to be a sequence, got " (view au)) au)
+    (check [:seq (as autocmd au)])
     (table.insert out (autocmd id au)))
   :return
   (dolist out))
@@ -186,17 +170,15 @@
 ;; -------------------- ;;
 (lambda parse-command-args [args]
   "converts list of 'args' into table of valid command-opts."
-  (assert-compile
-    (even? (# args))
-    "  command: expected even number of values in args." args)
   (local out {:force true})
   (each [idx val (ipairs args)]
     (if (odd? idx)
         (tset out val (. args (inc idx)))))
   :return out)
 
-(lmd command! [args lhs rhs]
+(lun command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
+  (check [:even (as args (# args))])
   `(vim.api.nvim_create_user_command ,lhs ,(parse-cmd rhs) ,(parse-command-args args)))
 
 
@@ -217,31 +199,31 @@
            (tset ,method (string.sub ,name 3) false)
            (tset ,method ,name true))))
 
-(lmd set! [name ?val]
+(lun set! [name ?val]
   "sets vim option 'name'."
   (option-setter 'vim.opt name ?val))
 
-(lmd setlocal! [name ?val]
+(lun setlocal! [name ?val]
   "sets local vim option 'name'."
   (option-setter 'vim.opt_local name ?val))
 
-(lmd setglobal! [name ?val]
+(lun setglobal! [name ?val]
   "sets global vim option 'name' without changing the local value."
   (option-setter 'vim.opt_global name ?val))
 
-(lmd set+ [name val]
+(lun set+ [name val]
   "appends 'val' to vim option 'name'."
   `(: (. vim.opt ,(parse-sym name)) :append ,val))
 
-(lmd set^ [name val]
+(lun set^ [name val]
   "prepends 'val' to vim option 'name'."
   `(: (. vim.opt ,(parse-sym name)) :prepend ,val))
 
-(lmd rem! [name val]
+(lun rem! [name val]
   "removes 'val' from vim option 'name'."
   `(: (. vim.opt ,(parse-sym name)) :remove ,val))
 
-(lmd color! [name]
+(lun color! [name]
   "sets vim colorscheme to 'name'."
   (exec [[:colorscheme (parse-sym name)]]))
 
@@ -249,11 +231,11 @@
 ;; -------------------- ;;
 ;;      VARIABLES       ;;
 ;; -------------------- ;;
-(lmd g! [name val]
+(lun g! [name val]
   "sets global variable 'name' to 'val'."
   `(tset vim.g ,(parse-sym name) ,val))
 
-(lmd b! [name val]
+(lun b! [name val]
   "sets buffer scoped variable 'name' to 'val'."
   `(tset vim.b ,(parse-sym name) ,val))
 

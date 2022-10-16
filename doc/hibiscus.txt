@@ -701,7 +701,16 @@ TABLE MERGING                                         *hibiscus-table-merging*
 
 
 
-  merges all values of {list1} and {list2} together
+  merges all values of {list1} and {list2} together, and returns a new list
+
+
+>
+    (merge-tbl {tbl1} {tbl2})
+<
+
+
+
+  merges {tbl2} onto {tbl1}, and returns a new table
 
 
 >

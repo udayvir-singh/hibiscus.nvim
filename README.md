@@ -474,7 +474,12 @@ Sets buffer scoped variable {name} to {val}.
 ```clojure
 (merge-list {list1} {list2})
 ```
-> merges all values of {list1} and {list2} together
+> merges all values of {list1} and {list2} together, and returns a new list
+
+```clojure
+(merge-tbl {tbl1} {tbl2})
+```
+> merges {tbl2} onto {tbl1}, and returns a new table
 
 ```clojure
 (merge {tbl1} {tbl2})
