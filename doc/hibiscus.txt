@@ -18,7 +18,7 @@ Table of Contents                                 *hibiscus-table-of-contents*
   - fstring                                                 |hibiscus-fstring|
   - pretty print                                       |hibiscus-pretty-print|
   - general                                                 |hibiscus-general|
-  - checking                                               |hibiscus-checking|
+  - checking values                                 |hibiscus-checking-values|
   - unary operators                                 |hibiscus-unary-operators|
   - string concat                                     |hibiscus-string-concat|
   - table merging                                     |hibiscus-table-merging|
@@ -525,7 +525,7 @@ GENERAL                                                     *hibiscus-general*
   checks if {x} is equal to any one of {…}
 
 
-CHECKING                                                   *hibiscus-checking*
+CHECKING VALUES                                     *hibiscus-checking-values*
 
 >
     (nil? {x})
@@ -600,7 +600,7 @@ CHECKING                                                   *hibiscus-checking*
 
 
 >
-    (list? {tbl})
+    (seq? {tbl})
 <
 
 

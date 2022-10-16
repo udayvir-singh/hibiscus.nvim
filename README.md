@@ -377,7 +377,7 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > checks if {x} is equal to any one of {...}
 
-## checking
+## checking values
 ```clojure
 (nil? {x})
 ```
@@ -419,7 +419,7 @@ Sets buffer scoped variable {name} to {val}.
 > checks if {x} is of table type
 
 ```clojure
-(list? {tbl})
+(seq? {tbl})
 ```
 > checks if {tbl} is valid list / array
 

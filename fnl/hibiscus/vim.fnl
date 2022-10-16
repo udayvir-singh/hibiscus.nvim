@@ -1,4 +1,4 @@
-(import-macros {: or= : ++ : inc : odd? : even? : string? : tappend : merge} :hibiscus.core)
+(require-macros :hibiscus.core)
 
 (local M {})
 

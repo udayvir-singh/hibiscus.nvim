@@ -114,7 +114,7 @@
   "checks if 'x' is of table type."
   `(= :table (type ,x)))
 
-(fun list? [tbl]
+(fun seq? [tbl]
   "checks if 'tbl' is a valid list."
   `(vim.tbl_islist ,tbl))
 
@@ -178,7 +178,7 @@
 
 (lmd merge [tbl1 tbl2]
   "merges 'tbl2' onto 'tbl1', correctly appending lists."
-  `(if (and ,(list? tbl1) ,(list? tbl2))
+  `(if (and ,(seq? tbl1) ,(seq? tbl2))
        ,(merge-list tbl1 tbl2)
        :else
        (vim.tbl_deep_extend "force" ,tbl1 ,tbl2)))
