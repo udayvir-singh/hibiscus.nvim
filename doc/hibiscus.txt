@@ -365,7 +365,7 @@ VIM OPTIONS                                             *hibiscus-vim-options*
                                                                *hibiscus-set!*
 
 set!                                   Works like command `:set`, sets vim
-                                       option {name} to {val}
+                                       option {name}
 
 
 >
@@ -380,12 +380,24 @@ set!                                   Works like command `:set`, sets vim
                                                           *hibiscus-setlocal!*
 
 setlocal!                              Works like command `:setlocal`, sets
-                                       local vim option {name} to {val}
+                                       local vim option {name}
 
 
 >
     (setlocal! filetype "md")
     (setlocal! number)
+<
+
+
+                                                         *hibiscus-setglobal!*
+
+setglobal!                             Works like command `:setglobal`, sets
+                                       only the global vim option {name}
+                                       without changing the local value
+
+
+>
+    (setglobal! wrap)
 <
 
 

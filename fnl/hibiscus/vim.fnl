@@ -223,21 +223,11 @@
 
 (lmd setlocal! [name ?val]
   "sets local vim option 'name'."
-  (local name (parse-sym name))
-  (if (string? name)
-      (let [name* (string.gsub name "^no" "")
-            info  (vim.api.nvim_get_option_info name*)
-            scope (. info "scope")]
-        (if (= scope :buf)
-            (option-setter 'vim.bo name ?val)
-            (option-setter 'vim.wo name ?val)))
-      ; else compute at runtime
-      '(let [name#  (string.gsub ,name "^no" "")
-             info#  (vim.api.nvim_get_option_info name#)
-             scope# (. info# "scope")]
-         (if (= scope# :buf)
-             ,(option-setter 'vim.bo name ?val)
-             ,(option-setter 'vim.wo name ?val)))))
+  (option-setter 'vim.opt_local name ?val))
+
+(lmd setglobal! [name ?val]
+  "sets global vim option 'name' without changing the local value."
+  (option-setter 'vim.opt_global name ?val))
 
 (lmd set+ [name val]
   "appends 'val' to vim option 'name'."

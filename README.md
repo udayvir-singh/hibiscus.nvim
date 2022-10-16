@@ -273,7 +273,8 @@ Concats strings in {list} with {sep} at compile time
 
 ## vim options
 #### set!
-Works like command `:set`, sets vim option {name} to {val}
+Works like command `:set`, sets vim option {name}
+
 ```clojure
 (set! nobackup)
 (set! tabstop 4)
@@ -283,10 +284,18 @@ Works like command `:set`, sets vim option {name} to {val}
 ```
 
 #### setlocal!
-Works like command `:setlocal`, sets local vim option {name} to {val}
+Works like command `:setlocal`, sets local vim option {name}
+
 ```clojure
 (setlocal! filetype "md")
 (setlocal! number)
+```
+
+#### setglobal!
+Works like command `:setglobal`, sets only the global vim option {name} without changing the local value
+
+```clojure
+(setglobal! wrap)
 ```
 
 #### set+
@@ -298,6 +307,7 @@ Appends {val} to string-style option {name}
 
 #### set^
 Prepends {val} to string-style option {name}
+
 ```clojure
 (set^ wildignore ["*.foo" "*.baz"])
 ```
