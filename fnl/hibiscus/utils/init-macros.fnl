@@ -3,7 +3,7 @@
 ;; -------------------- ;;
 ;;        UTILS         ;;
 ;; -------------------- ;;
-(lambda ac [cond ...]
+(lambda ass [cond ...]
   "shorthand for assert-compile."
   `(assert-compile ,cond (.. "  " ,(sym :__name__) ": " ,...)))
 
@@ -13,18 +13,18 @@
 ;; -------------------- ;;
 (lambda M.fun [name args ...]
   "defines function 'name' and exports it to M."
-  (local name-sym '(local ,(sym :__name__) ,(tostring name)))
+  (local name-sym `(local ,(sym :__name__) ,(tostring name)))
   `(tset M ,(tostring name) (fn ,name ,args ,name-sym ,...)))
 
 (lambda M.lun [name args ...]
   "defines lambda function 'name' and exports it to M."
   (local name-str (tostring name))
-  (local name-sym '(local ,(sym :__name__) ,name-str))
+  (local name-sym `(local ,(sym :__name__) ,name-str))
   (local asrt [])
   (each [_ arg (ipairs args)]
     (if (and (not= "..." (tostring arg)) (not= "?" (string.sub (tostring arg) 1 1)))
         (table.insert asrt
-          (ac '(not= ,arg nil) "Missing required argument '" (tostring arg) "'."))))
+          (ass `(not= ,arg nil) "Missing required argument '" (tostring arg) "'."))))
   `(tset M ,name-str
      (fn ,name ,args ,name-sym (do ,(unpack asrt)) ,...)))
 
@@ -34,26 +34,26 @@
 ;; -------------------- ;;
 (lambda assert-real [v scope]
   "asserts if 'v' is a symbol."
-  (ac v "Missing required argument '" scope "'."))
+  (ass v "Missing required argument '" scope "'."))
 
 (lambda assert-even [v scope]
   "asserts if 'v' is even."
-  (ac '(= 0 (% ,v 2))
+  (ass `(= 0 (% ,v 2))
       "expected even number of arguments in '" scope "'."))
 
 (lambda assert-sym [v scope]
   "asserts if 'v' is a symbol."
-  (ac '(sym? ,v)
+  (ass `(sym? ,v)
       "'" scope "' expected to be a symbol."))
 
 (lambda assert-seq [v scope]
   "asserts if 'v' is a symbol."
-  (ac '(vim.tbl_islist ,v)
+  (ass `(vim.tbl_islist ,v)
       "'" scope "' expected to be a sequence."))
 
 (lambda assert-type [t v scope]
   "asserts if 'v' is of type 't'."
-  (ac '(= ,t (type ,v))
+  (ass `(= ,t (type ,v))
       "'" scope "' expected to be of type " t "."))
 
 (lambda M.check [c]

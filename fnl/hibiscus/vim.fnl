@@ -192,8 +192,8 @@
       `(tset ,method ,name ,?val)
       (string? name)
       (if (= :no (string.sub name 1 2))
-          '(tset ,method ,(string.sub name 3) false)
-          '(tset ,method ,name true))
+          `(tset ,method ,(string.sub name 3) false)
+          `(tset ,method ,name true))
       ; else compute at runtime
       `(if (= :no (string.sub ,name 1 2))
            (tset ,method (string.sub ,name 3) false)
