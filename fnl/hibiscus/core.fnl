@@ -99,9 +99,13 @@
   "checks if 'tbl' is a valid list."
   `(vim.tbl_islist ,tbl))
 
-(fun empty? [tbl]
-  "checks if 'tbl' is empty."
-  `(and ,(table? tbl) (= 0 (length ,tbl))))
+(fun empty? [x]
+  "checks if 'x' is empty."
+  `(if ,(string? x)
+        (= 0 (length ,x))
+       ,(table? x)
+        ((fn [t#] (each [# (pairs t#)] (lua "return false")) true) ,x)
+        false))
 
 
 ;; -------------------- ;;

@@ -384,6 +384,11 @@ Sets buffer scoped variable {name} to {val}.
 > checks if value of {x} is nil
 
 ```clojure
+(empty? {x})
+```
+> checks if {x} :: [string or table] is empty
+
+```clojure
 (boolean? {x})
 ```
 > checks if {x} is of boolean type
@@ -422,11 +427,6 @@ Sets buffer scoped variable {name} to {val}.
 (seq? {tbl})
 ```
 > checks if {tbl} is valid list / array
-
-```clojure
-(empty? {tbl})
-```
-> checks if {tbl} has length of 0
 
 ## unary operators
 ```clojure

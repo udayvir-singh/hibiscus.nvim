@@ -537,6 +537,15 @@ CHECKING VALUES                                     *hibiscus-checking-values*
 
 
 >
+    (empty? {x})
+<
+
+
+
+  checks if {x} :: [string or table] is empty
+
+
+>
     (boolean? {x})
 <
 
@@ -606,15 +615,6 @@ CHECKING VALUES                                     *hibiscus-checking-values*
 
 
   checks if {tbl} is valid list / array
-
-
->
-    (empty? {tbl})
-<
-
-
-
-  checks if {tbl} has length of 0
 
 
 UNARY OPERATORS                                     *hibiscus-unary-operators*
