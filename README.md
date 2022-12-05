@@ -90,10 +90,12 @@ Bootstraps packer and calls packer.init function with {opts?}.
 Wrapper around packer.startup function, automatically adds packer to plugin list and syncs it.
 
 #### use!
-<pre lang="clojure"><code>(use! {name} {...})
+<pre lang="clojure"><code>(use! {name} {...opts})
 </pre></code>
 
 Much more lisp friendly wrapper over packer.use function.
+
+Adds extra option `require` to automatically require modules, accepts a `string` or `list` of module names.
 
 ##### Examples:
 ```clojure
@@ -104,7 +106,7 @@ Much more lisp friendly wrapper over packer.use function.
         :requires ["udayvir-singh/tangerine.nvim"])
 
   (use! :some-plugin
-        :module "path/module" ; automatically requires that module
+        :require "path/module" ; automatically requires this module
         ...))
 ```
 

@@ -43,15 +43,22 @@
 ;; -------------------- ;;
 (lambda parse-conf [name opts]
   "parses 'name' and list of 'opts' into valid packer.use args."
+  (local __name__ "use!")
   (local out [name])
   (each [idx val (ipairs opts)]
     (local next-val (. opts (+ idx 1)))
     (if (odd? idx)
         (tset out val next-val)))
-  ; parse module option
-  (when out.module
-    (tset out :config `(fn [] (require ,out.module) ,(and out.config `(,out.config))))
-    (tset out :module nil))
+  ; parse require option
+  (when out.require
+    ; normalize opts
+    (if (string? out.require)
+        (set out.require [out.require]))
+    ; create config handler
+    (check [:seq (as require out.require)])
+    (set out.config
+      `(fn [] (each [# x# (ipairs ,out.require)] (require x#)) ,(and out.config `(,out.config))))
+    (set out.require nil))
   :return out)
 
 (lun use! [name ...]

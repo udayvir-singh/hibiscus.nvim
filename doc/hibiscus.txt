@@ -144,10 +144,13 @@ list and syncs it.
 
                                                                *hibiscus-use!*
 
-use!                                   (use! {name} {…})
+use!                                   (use! {name} {…opts})
 
 
 Much more lisp friendly wrapper over packer.use function.
+
+Adds extra option `require` to automatically require modules, accepts a
+`string` or `list` of module names.
 
 EXAMPLES: ~
 
@@ -159,7 +162,7 @@ EXAMPLES: ~
             :requires ["udayvir-singh/tangerine.nvim"])
     
       (use! :some-plugin
-            :module "path/module" ; automatically requires that module
+            :require "path/module" ; automatically requires this module
             ...))
 <
 
