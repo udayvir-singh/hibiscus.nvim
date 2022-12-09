@@ -149,21 +149,27 @@ use!                                   (use! {name} {…opts})
 
 Much more lisp friendly wrapper over packer.use function.
 
-Adds extra option `require` to automatically require modules, accepts a
-`string` or `list` of module names.
+EXTRA OPTIONS: ~
+
+
+- `require` – wrapper around `config`, loads string or list of module names.
+- `depends` – wrapper around `requires`, configures plugin dependencies with lisp friendly syntax.
+
 
 EXAMPLES: ~
 
 >
     (packer
-      (use! :udayvir-singh/tangerine.nvim)
+      (use! :udayvir-singh/hibiscus.nvim)
     
-      (use! :udayvir-singh/hibiscus.nvim
-            :requires ["udayvir-singh/tangerine.nvim"])
+      (use! :plugin-foo
+            :require ["path.mod1" "path.mod2"]) ; automatically requires these modules
     
-      (use! :some-plugin
-            :require "path/module" ; automatically requires this module
-            ...))
+      (use! :plugin-baz
+            :depends [  ; define dependencies in same syntax as use!
+              "example1"
+              ["example2" :after "hibiscus.nvim" :require "xyz"]
+            ]))
 <
 
 

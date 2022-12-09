@@ -45,20 +45,34 @@
   "parses 'name' and list of 'opts' into valid packer.use args."
   (local __name__ "use!")
   (local out [name])
+  ;; convert opts into table
   (each [idx val (ipairs opts)]
     (local next-val (. opts (+ idx 1)))
     (if (odd? idx)
         (tset out val next-val)))
-  ; parse require option
+  ;; parse require option
   (when out.require
     ; normalize opts
     (if (string? out.require)
         (set out.require [out.require]))
-    ; create config handler
     (check [:seq (as require out.require)])
+    ; create config handler
+    (local handler
+      (if (= 1 (# out.require))
+          `(require ,(. out.require 1))
+          `(each [# x# (ipairs ,out.require)] (require x#))))
     (set out.config
-      `(fn [] (each [# x# (ipairs ,out.require)] (require x#)) ,(and out.config `(,out.config))))
+      `(fn [] ,handler ,(and out.config `(,out.config))))
     (set out.require nil))
+  ;; parse depends option
+  (when out.depends
+    (if (not out.requires)
+        (set out.requires []))
+    (each [_ dep (ipairs out.depends)]
+      (if (table? dep)
+          (table.insert out.requires (parse-conf (table.remove dep 1) dep))
+          (table.insert out.requires dep)))
+    (set out.depends nil))
   :return out)
 
 (lun use! [name ...]
