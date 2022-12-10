@@ -46,11 +46,11 @@ RATIONAL                                                   *hibiscus-rational*
 2. Installation                                        *hibiscus-installation*
 
 
-- Create file `plugin/1-tangerine.lua` to bootstrap hibiscus:
+- Create file `plugin/0-tangerine.lua` to bootstrap hibiscus:
 
 
 >
-    -- ~/.config/nvim/plugin/tangerine.lua
+    -- ~/.config/nvim/plugin/0-tangerine.lua
     
     -- pick your plugin manager, default [standalone]
     local pack = "tangerine" or "packer" or "paq"
