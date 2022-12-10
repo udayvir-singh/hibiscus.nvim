@@ -59,7 +59,7 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.3")
 ---
 
 #### Packer
-You can use packer to manage hibiscus afterwards:
+You can use packer to manage hibiscus afterwards [only do this if you haven't used ref option in bootstrap]:
 
 ```fennel
 (require-macros :hibiscus.packer)
@@ -67,12 +67,7 @@ You can use packer to manage hibiscus afterwards:
 (packer-setup)
 
 (packer
-  ; for git head
-  (use! :udayvir-singh/hibiscus.nvim)
-
-  ; for stable version
-  (use! :udayvir-singh/hibiscus.nvim
-        :tag "v1.3"))
+  (use! :udayvir-singh/hibiscus.nvim))
 ```
 
 #### Paq
