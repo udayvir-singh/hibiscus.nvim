@@ -18,7 +18,7 @@
        (vim.cmd "packadd packer.nvim")
        (print "packer.nvim: installed"))))
 
-(fun packer-setup [opts]
+(fun packer-setup! [opts]
   "bootstraps and setups config of packer with 'opts'."
   `(do ,(bootstrap)
        ((. (require :packer) :init) ,(or opts {}))))
@@ -27,7 +27,7 @@
 ;; -------------------- ;;
 ;;       STARTUP        ;;
 ;; -------------------- ;;
-(fun packer [...]
+(fun packer! [...]
   "syntactic sugar over packer's startup function."
   (local packer `(require :packer))
   `((. ,packer :startup)

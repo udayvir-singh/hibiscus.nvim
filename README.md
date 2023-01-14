@@ -50,7 +50,7 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.3")
 (require-macros :hibiscus.vim)
 
 ; require selected macros
-(import-macros {: fstring} :hibiscus.core)
+(import-macros {: fstring!} :hibiscus.core)
 (import-macros {: map!}    :hibiscus.vim)
 ```
 
@@ -64,9 +64,9 @@ You can use packer to manage hibiscus afterwards [only do this if you haven't us
 ```fennel
 (require-macros :hibiscus.packer)
 
-(packer-setup)
+(packer-setup!)
 
-(packer
+(packer!
   (use! :udayvir-singh/hibiscus.nvim))
 ```
 
@@ -84,14 +84,14 @@ You can use packer to manage hibiscus afterwards [only do this if you haven't us
 (require-macros :hibiscus.packer)
 ```
 
-#### packer-setup
-<pre lang="clojure"><code>(packer-setup {opts?})
+#### packer-setup!
+<pre lang="clojure"><code>(packer-setup! {opts?})
 </pre></code>
 
 Bootstraps packer and calls packer.init function with {opts?}.
 
-#### packer
-<pre lang="clojure"><code>(packer {...})
+#### packer!
+<pre lang="clojure"><code>(packer! {...})
 </pre></code>
 
 Wrapper around packer.startup function, automatically adds packer to plugin list and syncs it.
@@ -108,7 +108,7 @@ Much more lisp friendly wrapper over packer.use function.
 
 ##### Examples:
 ```clojure
-(packer
+(packer!
   (use! :udayvir-singh/hibiscus.nvim)
 
   (use! :plugin-foo
@@ -257,31 +257,31 @@ Defines user command {lhs} to {rhs}
 ```
 
 ## misc
-#### exec
-<pre lang="clojure"><code>(exec {cmds})
+#### exec!
+<pre lang="clojure"><code>(exec! {cmds})
 </pre></code>
 
 Converts [cmd] chunks in {cmds} to valid vim.cmd call
 
 ##### Example:
 ```clojure
-(exec [
+(exec! [
   [:set "nowrap"]
   [:echo "hello" "world"]
 ])
 ```
 
-#### concat
-<pre lang="clojure"><code>(concat {list} {sep})
+#### concat!
+<pre lang="clojure"><code>(concat! {list} {sep})
 </pre></code>
 
 Concats strings in {list} with {sep} at compile time
 
 ##### Examples:
 ```clojure
-(concat ["hello" "foo"] " ") ; -> "hello foo"
+(concat! ["hello" "foo"] " ") ; -> "hello foo"
 
-(concat ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
+(concat! ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
 ```
 
 ## vim options
@@ -361,9 +361,9 @@ Sets buffer scoped variable {name} to {val}.
 (import-macros {: fstring} :hibiscus.core)
 ```
 
-## fstring
+## fstring!
 ```clojure
-(fstring {str})
+(fstring! {str})
 ```
 > wrapper around string.format, works like javascript's template literates
 
@@ -373,14 +373,14 @@ Sets buffer scoped variable {name} to {val}.
 ##### Examples:
 ```clojure
 (local name "foo")
-(fstring "hello ${name}")
+(fstring! "hello ${name}")
 
-(fstring "${name}: two + four is $(+ 2 4).")
+(fstring! "${name}: two + four is $(+ 2 4).")
 ```
 
 ## pretty print
 ```clojure
-(dump {...})
+(dump! {...})
 ```
 > pretty prints {...} into human readable form
 
@@ -443,7 +443,7 @@ Sets buffer scoped variable {name} to {val}.
 
 ## unary operators
 ```clojure
-(inc {int})
+(inc! {int})
 ```
 > increments {int} by 1 and returns its value
 
@@ -453,7 +453,7 @@ Sets buffer scoped variable {name} to {val}.
 > increments variable {var} by 1 and returns its value
 
 ```clojure
-(dec {int})
+(dec! {int})
 ```
 > decrements {int} by 1 and returns its value
 
@@ -464,43 +464,43 @@ Sets buffer scoped variable {name} to {val}.
 
 ## string concat
 ```clojure
-(append {var} {str})
+(append! {var} {str})
 ```
 > appends {str} to variable {var}
 
 ```clojure
-(tappend {tbl} {key} {str})
+(tappend! {tbl} {key} {str})
 ```
 > appends {str} to {key} of table {tbl}
 
 ```clojure
-(prepend {var} {str})
+(prepend! {var} {str})
 ```
 > prepends {str} to variable {var}
 
 ```clojure
-(tprepend {tbl} {key} {str})
+(tprepend! {tbl} {key} {str})
 ```
 > prepends {str} to {key} of table {tbl}
 
 ## table merging
 ```clojure
-(merge-list {list1} {list2})
+(merge-list! {list1} {list2})
 ```
 > merges all values of {list1} and {list2} together, and returns a new list
 
 ```clojure
-(merge-tbl {tbl1} {tbl2})
+(merge-tbl! {tbl1} {tbl2})
 ```
 > merges {tbl2} onto {tbl1}, and returns a new table
 
 ```clojure
-(merge {tbl1} {tbl2})
+(merge! {tbl1} {tbl2})
 ```
 > merges {tbl1} and {tbl2}, correctly appending lists
 
 ```clojure
-(merge! {var} {tbl})
+(vmerge! {var} {tbl})
 ```
 > merges values of {tbl} onto variable {var}
 

@@ -50,7 +50,7 @@
 ;; -------------------- ;;
 ;;       GENERAL        ;;
 ;; -------------------- ;;
-(lun concat [lst sep]
+(lun concat! [lst sep]
   "smartly concats all strings in 'lst' with 'sep'."
   (check [:seq lst :string sep])
   (var out [])
@@ -60,7 +60,7 @@
     (local sep (if (< i (# lst)) sep ""))
     ; concat string
     (if (string? v)
-        (tappend out len (.. v sep))
+        (tappend! out len (.. v sep))
         :else
         (do (tset out (++ len) `(.. ,v ,sep))
             (++ len))))
@@ -69,12 +69,12 @@
       (unpack out)
       (list `.. (unpack out))))
 
-(lun exec [cmds]
+(lun exec! [cmds]
   "wraps [cmd] chunks in 'cmds' within vim.cmd block."
   (check [:seq cmds])
   (local out [])
   (each [_ cmd (ipairs cmds)]
-        (table.insert out `(vim.cmd ,(concat cmd " "))))
+        (table.insert out `(vim.cmd ,(concat! cmd " "))))
   (table.insert out true)
   :return
   (dolist out))
@@ -140,12 +140,12 @@
       (tset opts e true)
       (table.insert rem i))
     (when (= e :desc)
-      (local desc (. events (inc i)))
+      (local desc (. events (inc! i)))
       (assert-compile (= :string (type desc))
         "  missing argument to desc option in augroup!." events)
       (tset opts :desc desc)
       (table.insert rem i)
-      (table.insert rem (inc i))))
+      (table.insert rem (inc! i))))
   (local events (parse-list (list-remove events rem)))
   :return
   `(vim.api.nvim_create_autocmd ,events ,opts))
@@ -173,7 +173,7 @@
   (local out {:force true})
   (each [idx val (ipairs args)]
     (if (odd? idx)
-        (tset out val (. args (inc idx)))))
+        (tset out val (. args (inc! idx)))))
   :return out)
 
 (lun command! [args lhs rhs]
@@ -225,7 +225,7 @@
 
 (lun color! [name]
   "sets vim colorscheme to 'name'."
-  (exec [[:colorscheme (parse-sym name)]]))
+  (exec! [[:colorscheme (parse-sym name)]]))
 
 
 ;; -------------------- ;;

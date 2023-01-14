@@ -15,7 +15,7 @@ Table of Contents                                 *hibiscus-table-of-contents*
   - vim options                                         |hibiscus-vim-options|
   - variables                                             |hibiscus-variables|
 5. Core Macros                                          |hibiscus-core-macros|
-  - fstring                                                 |hibiscus-fstring|
+  - fstring!                                               |hibiscus-fstring!|
   - pretty print                                       |hibiscus-pretty-print|
   - general                                                 |hibiscus-general|
   - checking values                                 |hibiscus-checking-values|
@@ -90,7 +90,7 @@ RATIONAL                                                   *hibiscus-rational*
     (require-macros :hibiscus.vim)
     
     ; require selected macros
-    (import-macros {: fstring} :hibiscus.core)
+    (import-macros {: fstring!} :hibiscus.core)
     (import-macros {: map!}    :hibiscus.vim)
 <
 
@@ -109,9 +109,9 @@ Packer                                 You can use packer to manage hibiscus
 >
     (require-macros :hibiscus.packer)
     
-    (packer-setup)
+    (packer-setup!)
     
-    (packer
+    (packer!
       (use! :udayvir-singh/hibiscus.nvim))
 <
 
@@ -135,16 +135,16 @@ Packer                                 You can use packer to manage hibiscus
 <
 
 
-                                                       *hibiscus-packer-setup*
+                                                      *hibiscus-packer-setup!*
 
-packer-setup                           (packer-setup {opts*})
+packer-setup!                          (packer-setup! {opts*})
 
 
 Bootstraps packer and calls packer.init function with {opts*}.
 
-                                                             *hibiscus-packer*
+                                                            *hibiscus-packer!*
 
-packer                                 (packer {…})
+packer!                                (packer! {…})
 
 
 Wrapper around packer.startup function, automatically adds packer to plugin
@@ -167,7 +167,7 @@ EXTRA OPTIONS: ~
 EXAMPLES: ~
 
 >
-    (packer
+    (packer!
       (use! :udayvir-singh/hibiscus.nvim)
     
       (use! :plugin-foo
@@ -344,9 +344,9 @@ EXAMPLES: ~
 
 MISC                                                           *hibiscus-misc*
 
-                                                               *hibiscus-exec*
+                                                              *hibiscus-exec!*
 
-exec                                   (exec {cmds})
+exec!                                  (exec! {cmds})
 
 
 Converts [cmd] chunks in {cmds} to valid vim.cmd call
@@ -354,16 +354,16 @@ Converts [cmd] chunks in {cmds} to valid vim.cmd call
 EXAMPLE: ~
 
 >
-    (exec [
+    (exec! [
       [:set "nowrap"]
       [:echo "hello" "world"]
     ])
 <
 
 
-                                                             *hibiscus-concat*
+                                                            *hibiscus-concat!*
 
-concat                                 (concat {list} {sep})
+concat!                                (concat! {list} {sep})
 
 
 Concats strings in {list} with {sep} at compile time
@@ -371,9 +371,9 @@ Concats strings in {list} with {sep} at compile time
 EXAMPLES: ~
 
 >
-    (concat ["hello" "foo"] " ") ; -> "hello foo"
+    (concat! ["hello" "foo"] " ") ; -> "hello foo"
     
-    (concat ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
+    (concat! ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
 <
 
 
@@ -494,10 +494,10 @@ b!                                     Sets buffer scoped variable {name} to
 <
 
 
-FSTRING                                                     *hibiscus-fstring*
+FSTRING!                                                   *hibiscus-fstring!*
 
 >
-    (fstring {str})
+    (fstring! {str})
 <
 
 
@@ -514,16 +514,16 @@ EXAMPLES: ~
 
 >
     (local name "foo")
-    (fstring "hello ${name}")
+    (fstring! "hello ${name}")
     
-    (fstring "${name}: two + four is $(+ 2 4).")
+    (fstring! "${name}: two + four is $(+ 2 4).")
 <
 
 
 PRETTY PRINT                                           *hibiscus-pretty-print*
 
 >
-    (dump {...})
+    (dump! {...})
 <
 
 
@@ -637,7 +637,7 @@ CHECKING VALUES                                     *hibiscus-checking-values*
 UNARY OPERATORS                                     *hibiscus-unary-operators*
 
 >
-    (inc {int})
+    (inc! {int})
 <
 
 
@@ -655,7 +655,7 @@ UNARY OPERATORS                                     *hibiscus-unary-operators*
 
 
 >
-    (dec {int})
+    (dec! {int})
 <
 
 
@@ -675,7 +675,7 @@ UNARY OPERATORS                                     *hibiscus-unary-operators*
 STRING CONCAT                                         *hibiscus-string-concat*
 
 >
-    (append {var} {str})
+    (append! {var} {str})
 <
 
 
@@ -684,7 +684,7 @@ STRING CONCAT                                         *hibiscus-string-concat*
 
 
 >
-    (tappend {tbl} {key} {str})
+    (tappend! {tbl} {key} {str})
 <
 
 
@@ -693,7 +693,7 @@ STRING CONCAT                                         *hibiscus-string-concat*
 
 
 >
-    (prepend {var} {str})
+    (prepend! {var} {str})
 <
 
 
@@ -702,7 +702,7 @@ STRING CONCAT                                         *hibiscus-string-concat*
 
 
 >
-    (tprepend {tbl} {key} {str})
+    (tprepend! {tbl} {key} {str})
 <
 
 
@@ -713,7 +713,7 @@ STRING CONCAT                                         *hibiscus-string-concat*
 TABLE MERGING                                         *hibiscus-table-merging*
 
 >
-    (merge-list {list1} {list2})
+    (merge-list! {list1} {list2})
 <
 
 
@@ -722,7 +722,7 @@ TABLE MERGING                                         *hibiscus-table-merging*
 
 
 >
-    (merge-tbl {tbl1} {tbl2})
+    (merge-tbl! {tbl1} {tbl2})
 <
 
 
@@ -731,7 +731,7 @@ TABLE MERGING                                         *hibiscus-table-merging*
 
 
 >
-    (merge {tbl1} {tbl2})
+    (merge! {tbl1} {tbl2})
 <
 
 
@@ -740,7 +740,7 @@ TABLE MERGING                                         *hibiscus-table-merging*
 
 
 >
-    (merge! {var} {tbl})
+    (vmerge! {var} {tbl})
 <
 
 

@@ -16,11 +16,11 @@
         "    * install fennel globally or install tangerine.nvim."))
   :return out)
 
-(lambda set- [name val]
+(lambda set* [name val]
   "sets variable 'name' to 'val' and returns its value."
   `(do (set-forcibly! ,name ,val) ,name))
 
-(lambda tset- [tbl key val]
+(lambda tset* [tbl key val]
   "sets 'key' in 'tbl' to 'val' and returns its value."
   `(do (tset ,tbl ,key ,val) (. ,tbl ,key)))
 
@@ -42,20 +42,20 @@
 ;; -------------------- ;;
 ;;       FSTRING        ;;
 ;; -------------------- ;;
-(lun ast [expr]
+(lambda gen-ast [expr]
   "parses fennel 'expr' into ast."
   (local (ok out)
          (((. (require-fennel) :parser) expr "fstring")))
   :return out)
 
-(lun fstring [str]
+(lun fstring! [str]
   "wrapper around string.format, works like javascript's template literates."
   (check [:string str])
   (local args [])
   (each [xs (str:gmatch "$([({][^$]+[})])")]
     (if (xs:find "^{")
         (table.insert args (sym (xs:match "^{(.+)}$")))
-        (table.insert args (ast xs))))
+        (table.insert args (gen-ast xs))))
   :return
   `(string.format ,(str:gsub "$[({][^$]+[})]" "%%s") ,(unpack args)))
 
@@ -111,57 +111,57 @@
 ;; -------------------- ;;
 ;;        NUMBER        ;;
 ;; -------------------- ;;
-(lun inc [int]
+(lun inc! [int]
   "increments 'int' by 1."
   `(+ ,int 1))
 
 (lun ++ [v]
   "increments variable 'v' by 1."
-  (set- v (inc v)))
+  (set* v (inc! v)))
 
-(lun dec [int]
+(lun dec! [int]
   "decrements 'int' by 1."
   `(- ,int 1))
 
 (lun -- [v]
   "decrements variable 'v' by 1."
-  (set- v (dec v)))
+  (set* v (dec! v)))
 
 
 ;; -------------------- ;;
 ;;        STRING        ;;
 ;; -------------------- ;;
-(lun append [v str]
+(lun append! [v str]
   "appends 'str' to variable 'v'."
   (check [:sym (as var v)])
-  (set- v (list `.. v str)))
+  (set* v (list `.. v str)))
 
-(lun tappend [tbl key str]
+(lun tappend! [tbl key str]
   "appends 'str' to 'key' of table 'tbl'."
-  (tset- tbl key `(.. (or (. ,tbl ,key) "") ,str)))
+  (tset* tbl key `(.. (or (. ,tbl ,key) "") ,str)))
 
-(lun prepend [v str]
+(lun prepend! [v str]
   "prepends 'str' to variable 'v'."
   (check [:sym (as var v)])
-  (set- v (list `.. str v)))
+  (set* v (list `.. str v)))
 
-(lun tprepend [tbl key str]
+(lun tprepend! [tbl key str]
   "prepends 'str' to 'key' of table 'tbl'."
-  (tset- tbl key `(.. ,str (or (. ,tbl ,key) ""))))
+  (tset* tbl key `(.. ,str (or (. ,tbl ,key) ""))))
 
 
 ;; -------------------- ;;
 ;;        TABLE         ;;
 ;; -------------------- ;;
-(lun merge-list [list1 list2]
+(lun merge-list! [list1 list2]
   "merges all values of 'list1' and 'list2' together."
   `(let [out# (vim.deepcopy ,list1)]
      (each [# v# (ipairs (vim.deepcopy ,list2))]
            (table.insert out# v#))
      :return out#))
 
-(lun merge-tbl [tbl1 tbl2]
-  "merges 'tbl2' onto 'tbl1'."
+(lun merge-tbl! [tbl1 tbl2]
+  "merges 'tbl2' onto 'tbl1', retuens a new tbl."
   `(do
    (fn m# [x# y#]
      (local out# (vim.deepcopy x#))
@@ -172,23 +172,22 @@
      :return out#)
    (m# ,tbl1 ,tbl2)))
 
-(lun merge [tbl1 tbl2]
+(lun merge! [tbl1 tbl2]
   "merges 'tbl2' onto 'tbl1', correctly appending lists."
   `(if (and ,(seq? tbl1) ,(seq? tbl2))
-       ,(merge-list tbl1 tbl2)
-       :else
-       ,(merge-tbl tbl1 tbl2)))
+       ,(merge-list! tbl1 tbl2)
+       ,(merge-tbl! tbl1 tbl2)))
 
-(lun merge! [v tbl]
+(lun vmerge! [v tbl]
   "merges 'tbl' onto variable 'v'."
   (check [:sym (as var v)])
-  (set- v (M.merge v tbl)))
+  (set* v (M.merge! v tbl)))
 
 
 ;; -------------------- ;;
 ;;     PRETTY PRINT     ;;
 ;; -------------------- ;;
-(fun dump [...]
+(fun dump! [...]
   "pretty prints {...} into human readable form."
   `(let [out# []]
      (if (?. _G.tangerine :api :serialize)
