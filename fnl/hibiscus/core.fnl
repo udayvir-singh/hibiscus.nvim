@@ -6,6 +6,7 @@
 ;;        UTILS         ;;
 ;; -------------------- ;;
 (fn require-fennel []
+  ; try to load fennel
   (var (ok out) (pcall require :tangerine.fennel))
   (if ok
     (set out (out.load))
@@ -37,6 +38,14 @@
        (set out# true)
        (lua :break)))
    :return out#))
+
+(lun enum! [name ...]
+  "defines enumerated values for names."
+  (local vals [])
+  (each [i n (ipairs [name ...])]
+    (check [:sym (as name n)])
+    (table.insert vals i))
+  '(local ,[name ...] ,vals))
 
 
 ;; -------------------- ;;
@@ -131,6 +140,14 @@
 ;; -------------------- ;;
 ;;        STRING        ;;
 ;; -------------------- ;;
+(lun split! [str sep]
+  "splits 'str' into a list at each 'sep'."
+  '(do
+   (local out# [])
+   (each [x# (string.gmatch (.. ,str ,sep) (.. "(.-)" ,sep "+"))]
+     (table.insert out# x#))
+   :return out#))
+
 (lun append! [v str]
   "appends 'str' to variable 'v'."
   (check [:sym (as var v)])
@@ -153,24 +170,41 @@
 ;; -------------------- ;;
 ;;        TABLE         ;;
 ;; -------------------- ;;
+(lun tmap! [tbl handler]
+  "maps values in table with 'handler'."
+  '(let [out# {}
+         fnc# ,handler]
+     (each [key# val# (pairs ,tbl)]
+       (tset out# key# (fnc# key# val#)))
+     :return out#))
+
+(lun filter! [lst handler]
+  "filters values in list with 'handler'."
+  '(let [out# []
+         fnc# ,handler]
+     (each [# val# (pairs ,lst)]
+       (if (fnc# val#)
+           (table.insert out# val#)))
+     :return out#))
+
 (lun merge-list! [list1 list2]
-  "merges all values of 'list1' and 'list2' together."
+  "appends all values of 'list1' and 'list2' together."
   `(let [out# (vim.deepcopy ,list1)]
-     (each [# v# (ipairs (vim.deepcopy ,list2))]
-           (table.insert out# v#))
+     (each [# val# (ipairs (vim.deepcopy ,list2))]
+           (table.insert out# val#))
      :return out#))
 
 (lun merge-tbl! [tbl1 tbl2]
-  "merges 'tbl2' onto 'tbl1', retuens a new tbl."
+  "merges 'tbl2' onto 'tbl1', returns a new table."
   `(do
-   (fn m# [x# y#]
+   (fn mrg# [x# y#]
      (local out# (vim.deepcopy x#))
      (each [k# v# (pairs (vim.deepcopy y#))]
        (if (= :table (type v#) (type (. out# k#)))
-           (tset out# k# (m# (. out# k#) v#))
+           (tset out# k# (mrg# (. out# k#) v#))
            (tset out# k# v#)))
      :return out#)
-   (m# ,tbl1 ,tbl2)))
+   (mrg# ,tbl1 ,tbl2)))
 
 (lun merge! [tbl1 tbl2]
   "merges 'tbl2' onto 'tbl1', correctly appending lists."

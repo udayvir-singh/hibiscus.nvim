@@ -15,13 +15,11 @@ Table of Contents                                 *hibiscus-table-of-contents*
   - vim options                                         |hibiscus-vim-options|
   - variables                                             |hibiscus-variables|
 5. Core Macros                                          |hibiscus-core-macros|
-  - fstring!                                               |hibiscus-fstring!|
-  - pretty print                                       |hibiscus-pretty-print|
   - general                                                 |hibiscus-general|
   - checking values                                 |hibiscus-checking-values|
-  - unary operators                                 |hibiscus-unary-operators|
-  - string concat                                     |hibiscus-string-concat|
-  - table merging                                     |hibiscus-table-merging|
+  - number                                                   |hibiscus-number|
+  - string                                                   |hibiscus-string|
+  - table                                                     |hibiscus-table|
 6. End Credits                                          |hibiscus-end-credits|
 
 ==============================================================================
@@ -76,7 +74,7 @@ RATIONAL                                                   *hibiscus-rational*
     bootstrap("https://github.com/udayvir-singh/hibiscus.nvim")
     
     -- for stable version
-    bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.3")
+    bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
 <
 
 
@@ -494,16 +492,28 @@ b!                                     Sets buffer scoped variable {name} to
 <
 
 
-FSTRING!                                                   *hibiscus-fstring!*
+GENERAL                                                     *hibiscus-general*
 
->
-    (fstring! {str})
-<
+                                                              *hibiscus-dump!*
+
+dump!                                  (dump! {…})
 
 
+Pretty prints {…} into human readable form
 
-  wrapper around string.format, works like javascript’s template literates
+                                                                *hibiscus-or=*
 
+or=                                    (or= {x} {…})
+
+
+Checks if {x} is equal to any one of {…}
+
+                                                           *hibiscus-fstring!*
+
+fstring!                               (fstring! {str})
+
+
+Wrapper around string.format, works like javascript’s template literates
 
 
 - `${...}` is parsed as variable
@@ -520,26 +530,18 @@ EXAMPLES: ~
 <
 
 
-PRETTY PRINT                                           *hibiscus-pretty-print*
+                                                              *hibiscus-enum!*
+
+enum!                                  (enum! {name} …)
+
+
+Defines enumerated values for names.
+
+EXAMPLE: ~
 
 >
-    (dump! {...})
+    (enum! A B C) ; A=1, B=2, C=3
 <
-
-
-
-  pretty prints {…} into human readable form
-
-
-GENERAL                                                     *hibiscus-general*
-
->
-    (or= {x} ...)
-<
-
-
-
-  checks if {x} is equal to any one of {…}
 
 
 CHECKING VALUES                                     *hibiscus-checking-values*
@@ -634,7 +636,7 @@ CHECKING VALUES                                     *hibiscus-checking-values*
   checks if {tbl} is valid list / array
 
 
-UNARY OPERATORS                                     *hibiscus-unary-operators*
+NUMBER                                                       *hibiscus-number*
 
 >
     (inc! {int})
@@ -672,7 +674,7 @@ UNARY OPERATORS                                     *hibiscus-unary-operators*
   decrements variable {var} by 1 and returns its value
 
 
-STRING CONCAT                                         *hibiscus-string-concat*
+STRING                                                       *hibiscus-string*
 
 >
     (append! {var} {str})
@@ -710,7 +712,36 @@ STRING CONCAT                                         *hibiscus-string-concat*
   prepends {str} to {key} of table {tbl}
 
 
-TABLE MERGING                                         *hibiscus-table-merging*
+>
+    (split! {str} {sep})
+<
+
+
+
+  splits {str} into a list at each {sep}.
+
+
+TABLE                                                         *hibiscus-table*
+
+>
+    (tmap! {tbl} {handler})
+<
+
+
+
+  maps values in {tbl} with {handler}.
+  {handler} takes in (key, val) and returns a new value.
+
+
+>
+    (filter! {list} {handler})
+<
+
+
+
+  filters values in {list} with {handler}.
+  {handler} takes in (val) and returns a boolean.
+
 
 >
     (merge-list! {list1} {list2})

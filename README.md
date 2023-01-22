@@ -361,11 +361,25 @@ Sets buffer scoped variable {name} to {val}.
 (import-macros {: fstring} :hibiscus.core)
 ```
 
-## fstring!
-```clojure
-(fstring! {str})
-```
-> wrapper around string.format, works like javascript's template literates
+## general
+
+#### dump!
+<pre lang="clojure"><code>(dump! {...})
+</pre></code>
+
+Pretty prints {...} into human readable form
+
+#### or=
+<pre lang="clojure"><code>(or= {x} {...})
+</pre></code>
+
+Checks if {x} is equal to any one of {...}
+
+#### fstring!
+<pre lang="clojure"><code>(fstring! {str})
+</pre></code>
+
+Wrapper around string.format, works like javascript's template literates
 
 - `${...}` is parsed as variable
 - `$(...)` is parsed as fennel code
@@ -378,17 +392,16 @@ Sets buffer scoped variable {name} to {val}.
 (fstring! "${name}: two + four is $(+ 2 4).")
 ```
 
-## pretty print
-```clojure
-(dump! {...})
-```
-> pretty prints {...} into human readable form
+#### enum!
+<pre lang="clojure"><code>(enum! {name} ...)
+</pre></code>
 
-## general
+Defines enumerated values for names.
+
+##### Example:
 ```clojure
-(or= {x} ...)
+(enum! A B C) ; A=1, B=2, C=3
 ```
-> checks if {x} is equal to any one of {...}
 
 ## checking values
 ```clojure
@@ -441,7 +454,7 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > checks if {tbl} is valid list / array
 
-## unary operators
+## number
 ```clojure
 (inc! {int})
 ```
@@ -462,7 +475,7 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > decrements variable {var} by 1 and returns its value
 
-## string concat
+## string
 ```clojure
 (append! {var} {str})
 ```
@@ -483,7 +496,26 @@ Sets buffer scoped variable {name} to {val}.
 ```
 > prepends {str} to {key} of table {tbl}
 
-## table merging
+```clojure
+(split! {str} {sep})
+```
+> splits {str} into a list at each {sep}.
+
+## table
+```clojure
+(tmap! {tbl} {handler})
+```
+> maps values in {tbl} with {handler}.
+>
+> {handler} takes in (key, val) and returns a new value.
+
+```clojure
+(filter! {list} {handler})
+```
+> filters values in {list} with {handler}.
+>
+> {handler} takes in (val) and returns a boolean.
+
 ```clojure
 (merge-list! {list1} {list2})
 ```
