@@ -344,18 +344,17 @@ MISC                                                           *hibiscus-misc*
 
                                                               *hibiscus-exec!*
 
-exec!                                  (exec! {cmds})
+exec!                                  (exec! {fn} …)
 
 
-Converts [cmd] chunks in {cmds} to valid vim.cmd call
+Converts functions into valid vim.cmd calls.
 
 EXAMPLE: ~
 
 >
-    (exec! [
-      [:set "nowrap"]
-      [:echo "hello" "world"]
-    ])
+    (exec!
+      (set "nowrap")
+      (hi! "link" "TSInclude" "Special"))
 <
 
 

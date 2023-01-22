@@ -69,14 +69,14 @@
       (unpack out)
       (list `.. (unpack out))))
 
-(lun exec! [cmds]
-  "wraps [cmd] chunks in 'cmds' within vim.cmd block."
-  (check [:seq cmds])
-  (local out [])
-  (each [_ cmd (ipairs cmds)]
-        (table.insert out `(vim.cmd ,(concat! cmd " "))))
-  (table.insert out true)
-  :return
+(lun exec! [func ...]
+  "converts functions into valid vim.cmd calls."
+  (local args [func ...])
+  (local out  [])
+  (each [_ arg (ipairs args)]
+    (check [:list arg])
+    (local cmd [(tostring (table.remove arg 1)) (unpack arg)])
+    (table.insert out `(vim.cmd ,(concat! cmd " "))))
   (dolist out))
 
 
@@ -225,7 +225,7 @@
 
 (lun color! [name]
   "sets vim colorscheme to 'name'."
-  (exec! [[:colorscheme (parse-sym name)]]))
+  (exec! '(colorscheme ,(parse-sym name))))
 
 
 ;; -------------------- ;;

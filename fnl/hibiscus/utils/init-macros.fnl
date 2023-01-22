@@ -41,6 +41,11 @@
   (ass `(= 0 (% ,v 2))
       "expected even number of arguments in '" scope "'."))
 
+(lambda assert-list [v scope]
+  "asserts if 'v' is a symbol."
+  (ass `(list? ,v)
+      "'" scope "' expected to be a function call."))
+
 (lambda assert-sym [v scope]
   "asserts if 'v' is a symbol."
   (ass `(sym? ,v)
@@ -76,6 +81,7 @@
         (match x
           :real (assert-real val scope)
           :even (assert-even val scope)
+          :list (assert-list val scope)
           :sym  (assert-sym val scope)
           :seq  (assert-seq val scope)
           _     (assert-type x val scope)))))

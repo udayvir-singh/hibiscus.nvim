@@ -258,17 +258,16 @@ Defines user command {lhs} to {rhs}
 
 ## misc
 #### exec!
-<pre lang="clojure"><code>(exec! {cmds})
+<pre lang="clojure"><code>(exec! {fn} ...)
 </pre></code>
 
-Converts [cmd] chunks in {cmds} to valid vim.cmd call
+Converts functions into valid vim.cmd calls.
 
 ##### Example:
 ```clojure
-(exec! [
-  [:set "nowrap"]
-  [:echo "hello" "world"]
-])
+(exec!
+  (set "nowrap")
+  (hi! "link" "TSInclude" "Special"))
 ```
 
 #### concat!
