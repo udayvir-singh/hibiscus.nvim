@@ -5,7 +5,7 @@ Companion library for [tangerine](https://github.com/udayvir-singh/tangerine.nvi
 but it can also be used standalone.
 
 <!-- ignore-line -->
-![Neovim version](https://img.shields.io/badge/For_Neovim-0.7-dab?style=for-the-badge&logo=neovim&logoColor=dab)
+![Neovim version](https://img.shields.io/badge/For_Neovim-0.8-dab?style=for-the-badge&logo=neovim&logoColor=dab)
 
 ## Rational
 - :candy: Syntactic eye candy over hellscape of lua api
