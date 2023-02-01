@@ -27,6 +27,62 @@
 
 
 ;; -------------------- ;;
+;;        CLASS         ;;
+;; -------------------- ;;
+(lun class! [name ...]
+  "defines a class of 'name'."
+  (check [:sym name])
+  (local methods (sym :__methods__))
+  (local mtbl    (sym :__mtbl__))
+  '(local ,name {
+    :new
+    (lambda [self# ...]
+      (local ,(sym (tostring name)) self#)
+      (local ,methods {})
+      (local ,mtbl {:__index ,methods :__class self#})
+      (do ,...)
+      (local init# (. ,methods :init))
+      (tset ,methods :init nil)
+      (if init#
+        (let [class# (init# ...)]
+          (assert (= :table (type class#))
+                  ,(.. "Error in class " (tostring name) ", init method must return a table"))
+          (setmetatable class# ,mtbl))
+        (error ,(.. "Missing init method to class " (tostring name)))))}))
+
+(lun method! [name args ...]
+  "defines a method within the scope of class."
+  (check [:sym name :seq args])
+  (each [_ arg (ipairs args)] (check [:sym arg]))
+  (assert-compile (in-scope? :__methods__)
+    "  method! can only be called inside a class." name)
+  (local methods (sym :__methods__))
+  (if (not= :init (tostring name))
+      (table.insert args 1 (sym :self)))
+  '(tset ,methods ,(tostring name)
+         (lambda ,args ,...)))
+
+(lun metamethod! [name args ...]
+  "defines a metamethod within the scope of class."
+  (check [:sym name :seq args])
+  (each [_ arg (ipairs args)] (check [:sym arg]))
+  (assert-compile (in-scope? :__mtbl__)
+    "  metamethod! can only be called inside a class." name)
+  (local mtbl (sym :__mtbl__))
+  (table.insert args 1 (sym :self))
+  '(tset ,mtbl ,(tostring name)
+         (lambda ,args ,...)))
+
+(lun instanceof? [val class]
+  "checks if {val} is an instance of {class}."
+  '(let [v# ,val
+         c# ,class]
+     (if (not= :table (type v#))
+         false
+         (= c# (. (or (getmetatable v#) {}) :__class)))))
+
+
+;; -------------------- ;;
 ;;       GENERAL        ;;
 ;; -------------------- ;;
 (fun or= [x ...]

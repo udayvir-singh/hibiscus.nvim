@@ -49,8 +49,8 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
 (require-macros :hibiscus.core)
 (require-macros :hibiscus.vim)
 
-; require selected macros
-(import-macros {: fstring!} :hibiscus.core)
+; require only selected macros (you can also rename them like this)
+(import-macros {:fstring! f!} :hibiscus.core)
 (import-macros {: map!}    :hibiscus.vim)
 ```
 
@@ -358,6 +358,114 @@ Sets buffer scoped variable {name} to {val}.
 (require-macros :hibiscus.core)
 ; or
 (import-macros {: fstring} :hibiscus.core)
+```
+
+## OOP
+
+## class!
+<pre lang="clojure"><code>(class! {name} {...})
+</pre></code>
+
+Defines a new class (object-oriented programming) with {name}.
+
+An `init` method must be present in all classes and it should return the base table for class.
+
+To create a instance of class, just call `new` method on {name}.
+
+##### Examples:
+```fennel
+;; -------------------- ;;
+;;   DEFINING CLASSES   ;;
+;; -------------------- ;;
+(class! stack
+  (method! init [list] list) ; arguments of new method are passed here
+
+  (method! push [val]
+    "inserts {val} into the stack."
+    (table.insert self val)) ; self variable is accessible from all methods
+
+  (metamethod! __tostring []
+    "converts stack into a string."
+    (table.concat self " ")))
+
+(class! stack-stream
+  (local state {:cursor 0})
+
+  (method! init [stack]
+    (set state.len (# stack)) ; private state
+    {: stack})                ; public state
+
+  (method! next []
+    "returns next item from stream."
+    (++ state.cursor)
+    (assert (<= state.cursor state.len)
+            "stack-stream: attempt to call next() on empty stream.")
+    (. self.stack state.cursor)))
+
+
+;; -------------------- ;;
+;;         DEMO         ;;
+;; -------------------- ;;
+(local st (stack:new [:a :b])) ; new method should be called to create a instance
+(st:push :c)
+(print (tostring st)) ; > "a b c"
+
+(local stream (stack-stream:new st))
+(print (stream:next)) ; > "a"
+(print (stream:next)) ; > "b"
+```
+
+#### method!
+<pre lang="clojure"><code>(method! {name} {args} {...})
+</pre></code>
+
+Defines a method within the scope of class.
+
+The `self` variable is accessible from the scope of every method.
+
+##### Example:
+```fennel
+(class! foo
+  (method! init [] {}) ; required for all classes
+
+  (method! hello []
+    (print "hello world!")))
+```
+
+#### metamethod!
+<pre lang="clojure"><code>(metamethod! {name} {args} {...})
+</pre></code>
+
+Defines a metamethod within the scope of class.
+
+The `self` variable is accessible from the scope of every metamethod.
+
+See lua docs for list of valid metamethods.
+
+##### Example:
+```fennel
+(class! foo
+  (method! init [] {}) ; required for all classes
+
+  (metamethod! __tostring []
+    "example_string"))
+```
+
+#### instanceof?
+<pre lang="clojure"><code>(instanceof? {val} {class})
+</pre></code>
+
+Checks if {val} is an instance of {class}.
+
+##### Example:
+```fennel
+(class! foo
+  (method! init [] {}))
+
+(local x (foo:new))
+
+(instanceof? x foo)  ; > true
+(instanceof? {} foo) ; > false
 ```
 
 ## general
