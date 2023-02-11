@@ -151,7 +151,7 @@
   `(vim.api.nvim_create_autocmd ,events ,opts))
 
 (lun augroup! [name ...]
-  "defines augroup with 'name' and {...} containing [[groups] pat cmd] chunks."
+  "defines augroup with 'name' and '...' containing [[groups] pat cmd] chunks."
   (check [:string name])
   ; define augroup
   (local id  (gensym :augid))

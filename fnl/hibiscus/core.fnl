@@ -42,13 +42,12 @@
       (local ,mtbl {:__index ,methods :__class self#})
       (do ,...)
       (local init# (. ,methods :init))
+      (assert init# ,(.. "Missing init method to class " (tostring name)))
       (tset ,methods :init nil)
-      (if init#
-        (let [class# (init# ...)]
-          (assert (= :table (type class#))
-                  ,(.. "Error in class " (tostring name) ", init method must return a table"))
-          (setmetatable class# ,mtbl))
-        (error ,(.. "Missing init method to class " (tostring name)))))}))
+      (let [class# (init# ...)]
+        (assert (= :table (type class#))
+                ,(.. "Error in class " (tostring name) ", init method must return a table"))
+        (setmetatable class# ,mtbl)))}))
 
 (lun method! [name args ...]
   "defines a method within the scope of class."
@@ -74,7 +73,7 @@
          (lambda ,args ,...)))
 
 (lun instanceof? [val class]
-  "checks if {val} is an instance of {class}."
+  "checks if 'val' is an instance of 'class'."
   '(let [v# ,val
          c# ,class]
      (if (not= :table (type v#))
@@ -85,23 +84,22 @@
 ;; -------------------- ;;
 ;;       GENERAL        ;;
 ;; -------------------- ;;
-(fun or= [x ...]
-  "checks if 'x' is equal to any one of {...}"
-  `(do
-   (var out# false)
-   (each [# v# (ipairs [,...])]
-     (when (= ,x v#)
-       (set out# true)
-       (lua :break)))
-   :return out#))
+(fun or= [val ...]
+  "checks if 'val' is equal to any one of '...'"
+  (local eq [])
+  (each [_ arg (ipairs [...])]
+    (table.insert eq '(= ,(sym :__val__) ,arg)))
+  '(let [,(sym :__val__) ,val]
+    (or ,(unpack eq))))
 
 (lun enum! [name ...]
   "defines enumerated values for names."
-  (local vals [])
-  (each [i n (ipairs [name ...])]
-    (check [:sym (as name n)])
-    (table.insert vals i))
-  '(local ,[name ...] ,vals))
+  (let [args [name ...]
+        vals []]
+    (each [i n (ipairs args)]
+      (check [:sym (as name n)])
+      (table.insert vals i))
+    '(local ,args ,vals)))
 
 
 ;; -------------------- ;;
@@ -278,7 +276,7 @@
 ;;     PRETTY PRINT     ;;
 ;; -------------------- ;;
 (fun dump! [...]
-  "pretty prints {...} into human readable form."
+  "pretty prints '...' into human readable form."
   `(let [out# []]
      (if (?. _G.tangerine :api :serialize)
          (table.insert out# [(_G.tangerine.api.serialize ,...)])
