@@ -225,7 +225,7 @@
 
 (lun color! [name]
   "sets vim colorscheme to 'name'."
-  (exec! '(colorscheme ,(parse-sym name))))
+  (exec! `(colorscheme ,(parse-sym name))))
 
 
 ;; -------------------- ;;

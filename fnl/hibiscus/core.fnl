@@ -34,7 +34,7 @@
   (check [:sym name])
   (local methods (sym :__methods__))
   (local mtbl    (sym :__mtbl__))
-  '(local ,name {
+  `(local ,name {
     :new
     (lambda [self# ...]
       (local ,(sym (tostring name)) self#)
@@ -58,7 +58,7 @@
   (local methods (sym :__methods__))
   (if (not= :init (tostring name))
       (table.insert args 1 (sym :self)))
-  '(tset ,methods ,(tostring name)
+  `(tset ,methods ,(tostring name)
          (lambda ,args ,...)))
 
 (lun metamethod! [name args ...]
@@ -69,12 +69,12 @@
     "  metamethod! can only be called inside a class." name)
   (local mtbl (sym :__mtbl__))
   (table.insert args 1 (sym :self))
-  '(tset ,mtbl ,(tostring name)
+  `(tset ,mtbl ,(tostring name)
          (lambda ,args ,...)))
 
 (lun instanceof? [val class]
   "checks if 'val' is an instance of 'class'."
-  '(let [v# ,val
+  `(let [v# ,val
          c# ,class]
      (if (not= :table (type v#))
          false
@@ -88,8 +88,8 @@
   "checks if 'val' is equal to any one of '...'"
   (local eq [])
   (each [_ arg (ipairs [...])]
-    (table.insert eq '(= ,(sym :__val__) ,arg)))
-  '(let [,(sym :__val__) ,val]
+    (table.insert eq `(= ,(sym :__val__) ,arg)))
+  `(let [,(sym :__val__) ,val]
     (or ,(unpack eq))))
 
 (lun enum! [name ...]
@@ -99,7 +99,7 @@
     (each [i n (ipairs args)]
       (check [:sym (as name n)])
       (table.insert vals i))
-    '(local ,args ,vals)))
+    `(local ,args ,vals)))
 
 
 ;; -------------------- ;;
@@ -196,7 +196,7 @@
 ;; -------------------- ;;
 (lun split! [str sep]
   "splits 'str' into a list at each 'sep'."
-  '(do
+  `(do
    (local out# [])
    (each [x# (string.gmatch (.. ,str ,sep) (.. "(.-)" ,sep "+"))]
      (table.insert out# x#))
@@ -226,7 +226,7 @@
 ;; -------------------- ;;
 (lun tmap! [tbl handler]
   "maps values in table with 'handler'."
-  '(let [out# {}
+  `(let [out# {}
          fnc# ,handler]
      (each [key# val# (pairs ,tbl)]
        (tset out# key# (fnc# key# val#)))
@@ -234,7 +234,7 @@
 
 (lun filter! [lst handler]
   "filters values in list with 'handler'."
-  '(let [out# []
+  `(let [out# []
          fnc# ,handler]
      (each [# val# (pairs ,lst)]
        (if (fnc# val#)
