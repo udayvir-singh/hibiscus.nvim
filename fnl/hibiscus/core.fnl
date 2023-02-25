@@ -101,6 +101,16 @@
       (table.insert vals i))
     `(local ,args ,vals)))
 
+(lun time! [label body ...]
+  "evaluates 'body' and calculates its runtime."
+  (check [:string label])
+  (local body [body ...])
+  `(let [start# (os.clock)
+         out#   (do (unpack ,body))
+         end#   (os.clock)]
+     (print (string.format "%s: %.1fms" ,label (* (- end# start#) 1000)))
+     :return out#))
+
 
 ;; -------------------- ;;
 ;;       FSTRING        ;;
@@ -144,11 +154,13 @@
 
 (fun odd? [x]
   "checks if 'x' is mathematically of odd parity ;}"
-  `(and ,(number? x) (= 1 (% ,x 2))))
+  `(and ,(number? x)
+        (= 1 (_G.bit.band ,x 1))))
 
 (fun even? [x]
   "checks if 'x' is mathematically of even parity ;}"
-  `(and ,(number? x) (= 0 (% ,x 2))))
+  `(and ,(number? x)
+        (= 0 (_G.bit.band ,x 1))))
 
 (fun fn? [x]
   "checks if 'x' is of function type."

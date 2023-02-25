@@ -510,6 +510,18 @@ Defines enumerated values for names.
 (enum! A B C) ; A=1, B=2, C=3
 ```
 
+#### enum!
+<pre lang="clojure"><code>(time! {label} ...)
+</pre></code>
+
+Prints execution time of {...} in milliseconds.
+
+##### Example:
+```clojure
+(time! :add
+  (+ 1 2)) ; add: [XXX]ms
+```
+
 ## checking values
 ```clojure
 (nil? {x})
