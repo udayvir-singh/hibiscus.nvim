@@ -49,7 +49,7 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
 (require-macros :hibiscus.core)
 (require-macros :hibiscus.vim)
 
-; require only selected macros (you can also rename them like this)
+; require specific macros (you can also rename them)
 (import-macros {:fstring! f!} :hibiscus.core)
 (import-macros {: map!}    :hibiscus.vim)
 ```
@@ -59,7 +59,7 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
 ---
 
 #### Packer
-You can use packer to manage hibiscus afterwards [only do this if you haven't used ref option in bootstrap]:
+You can use packer to manage hibiscus afterwards [use this if you haven't used `ref` option in bootstrap]:
 
 ```fennel
 (require-macros :hibiscus.packer)
@@ -85,29 +85,29 @@ You can use packer to manage hibiscus afterwards [only do this if you haven't us
 ```
 
 #### packer-setup!
-<pre lang="clojure"><code>(packer-setup! {opts?})
+<pre lang="fennel"><code>(packer-setup! {opts?})
 </pre></code>
 
 Bootstraps packer and calls packer.init function with {opts?}.
 
 #### packer!
-<pre lang="clojure"><code>(packer! {...})
+<pre lang="fennel"><code>(packer! {...})
 </pre></code>
 
 Wrapper around packer.startup function, automatically adds packer to plugin list and syncs it.
 
 #### use!
-<pre lang="clojure"><code>(use! {name} {...opts})
+<pre lang="fennel"><code>(use! {name} {...opts})
 </pre></code>
 
-Much more lisp friendly wrapper over packer.use function.
+Much more lisp friendly wrapper over `packer.use` function.
 
 ##### Extra Options:
 - `require` -- wrapper around `config`, loads string or list of module names.
 - `depends` -- wrapper around `requires`, configures plugin dependencies with lisp friendly syntax.
 
 ##### Examples:
-```clojure
+```fennel
 (packer!
   (use! :udayvir-singh/hibiscus.nvim)
 
@@ -130,14 +130,14 @@ Much more lisp friendly wrapper over packer.use function.
 
 ## keymaps
 #### map!
-<pre lang="clojure"><code>(map! {args} {lhs} {rhs} {desc?})
+<pre lang="fennel"><code>(map! {args} {lhs} {rhs} {desc?})
 </pre></code>
 
-Defines vim keymap for the given modes from {lhs} to {rhs}
+Defines vim keymap for the given modes from {lhs} to {rhs}.
 
 ##### Arguments:
 {args} can contain the following values:
-```clojure
+```fennel
 ; modes |                   options                           |
 [ nivcx  :remap :verbose :buffer :nowait :expr :unique :script ]
 ```
@@ -146,7 +146,7 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 - `remap`: opposite to `noremap`
 
 ##### Examples:
-```clojure
+```fennel
 ;; -------------------- ;;
 ;;      VIMSCRIPT       ;;
 ;; -------------------- ;;
@@ -168,20 +168,20 @@ Defines vim keymap for the given modes from {lhs} to {rhs}
 
 ## autocmds
 #### augroup!
-<pre lang="clojure"><code>(augroup! {name} {cmds})
+<pre lang="fennel"><code>(augroup! {name} {cmds})
 </pre></code>
 
-Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
+Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks.
 
 ##### Arguments:
 {args} can contain the following values:
-```clojure
+```fennel
 [ :nested :once :desc <desc> BufRead Filetype ...etc ]
 ```
 
 
 ##### Examples:
-```clojure
+```fennel
 ;; -------------------- ;;
 ;;      VIMSCRIPT       ;;
 ;; -------------------- ;;
@@ -216,10 +216,10 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 
 ## commands
 #### command!
-<pre lang="clojure"><code>(command! {args} {lhs} {rhs})
+<pre lang="fennel"><code>(command! {args} {lhs} {rhs})
 </pre></code>
 
-Defines user command {lhs} to {rhs}
+Defines user command {lhs} to {rhs}.
 
 ##### Arguments:
 {args} can contain the same opts as `nvim_create_user_command`:
@@ -238,7 +238,7 @@ Defines user command {lhs} to {rhs}
 ```
 
 ##### Examples:
-```clojure
+```fennel
 ;; -------------------- ;;
 ;;      VIMSCRIPT       ;;
 ;; -------------------- ;;
@@ -258,26 +258,26 @@ Defines user command {lhs} to {rhs}
 
 ## misc
 #### exec!
-<pre lang="clojure"><code>(exec! {fn} ...)
+<pre lang="fennel"><code>(exec! {fn} ...)
 </pre></code>
 
 Converts functions into valid vim.cmd calls.
 
 ##### Example:
-```clojure
+```fennel
 (exec!
   (set "nowrap")
   (hi! "link" "TSInclude" "Special"))
 ```
 
 #### concat!
-<pre lang="clojure"><code>(concat! {list} {sep})
+<pre lang="fennel"><code>(concat! {list} {sep})
 </pre></code>
 
-Concats strings in {list} with {sep} at compile time
+Concats strings in {list} with {sep} at compile time.
 
 ##### Examples:
-```clojure
+```fennel
 (concat! ["hello" "foo"] " ") ; -> "hello foo"
 
 (concat! ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
@@ -285,9 +285,9 @@ Concats strings in {list} with {sep} at compile time
 
 ## vim options
 #### set!
-Works like command `:set`, sets vim option {name}
+Works like command `:set`, sets vim option {name}.
 
-```clojure
+```fennel
 (set! nobackup)
 (set! tabstop 4)
 
@@ -296,45 +296,45 @@ Works like command `:set`, sets vim option {name}
 ```
 
 #### setlocal!
-Works like command `:setlocal`, sets local vim option {name}
+Works like command `:setlocal`, sets local vim option {name}.
 
-```clojure
+```fennel
 (setlocal! filetype "md")
 (setlocal! number)
 ```
 
 #### setglobal!
-Works like command `:setglobal`, sets only the global vim option {name} without changing the local value
+Works like command `:setglobal`, sets global vim option {name} without changing the local value.
 
-```clojure
+```fennel
 (setglobal! wrap)
 ```
 
 #### set+
-Appends {val} to string-style option {name}
+Appends {val} to string-style option {name}.
 
-```clojure
+```fennel
 (set+ wildignore "*.foo")
 ```
 
 #### set^
-Prepends {val} to string-style option {name}
+Prepends {val} to string-style option {name}.
 
-```clojure
+```fennel
 (set^ wildignore ["*.foo" "*.baz"])
 ```
 
 #### rem!
-Removes {val} from string-style option {name}
+Removes {val} from string-style option {name}.
 
-```clojure
+```fennel
 (rem! wildignore "*.baz")
 ```
 
 #### color!
-Sets vim colorscheme to {name}
+Sets vim colorscheme to {name}.
 
-```clojure
+```fennel
 (color! desert)
 ```
 
@@ -342,14 +342,14 @@ Sets vim colorscheme to {name}
 #### g!
 Sets global variable {name} to {val}.
 
-```clojure
+```fennel
 (g! mapleader " ")
 ```
 
 #### b!
 Sets buffer scoped variable {name} to {val}.
 
-```clojure
+```fennel
 (b! gretting "Hello World!")
 ```
 
@@ -363,14 +363,14 @@ Sets buffer scoped variable {name} to {val}.
 ## OOP
 
 ## class!
-<pre lang="clojure"><code>(class! {name} {...})
+<pre lang="fennel"><code>(class! {name} {...})
 </pre></code>
 
 Defines a new class (object-oriented programming) with {name}.
 
 An `init` method must be present in all classes and it should return the base table for class.
 
-To create a instance of class, just call `new` method on {name}.
+To create a instance of class, call `new` method on {name}.
 
 ##### Examples:
 ```fennel
@@ -416,7 +416,7 @@ To create a instance of class, just call `new` method on {name}.
 ```
 
 #### method!
-<pre lang="clojure"><code>(method! {name} {args} {...})
+<pre lang="fennel"><code>(method! {name} {args} {...})
 </pre></code>
 
 Defines a method within the scope of class.
@@ -433,7 +433,7 @@ The `self` variable is accessible from the scope of every method.
 ```
 
 #### metamethod!
-<pre lang="clojure"><code>(metamethod! {name} {args} {...})
+<pre lang="fennel"><code>(metamethod! {name} {args} {...})
 </pre></code>
 
 Defines a metamethod within the scope of class.
@@ -452,7 +452,7 @@ See lua docs for list of valid metamethods.
 ```
 
 #### instanceof?
-<pre lang="clojure"><code>(instanceof? {val} {class})
+<pre lang="fennel"><code>(instanceof? {val} {class})
 </pre></code>
 
 Checks if {val} is an instance of {class}.
@@ -471,28 +471,28 @@ Checks if {val} is an instance of {class}.
 ## general
 
 #### dump!
-<pre lang="clojure"><code>(dump! {...})
+<pre lang="fennel"><code>(dump! {...})
 </pre></code>
 
-Pretty prints {...} into human readable form
+Pretty prints {...} into human readable form.
 
 #### or=
-<pre lang="clojure"><code>(or= {x} {...})
+<pre lang="fennel"><code>(or= {x} {...})
 </pre></code>
 
-Checks if {x} is equal to any one of {...}
+Checks if {x} is equal to any one of {...}.
 
 #### fstring!
-<pre lang="clojure"><code>(fstring! {str})
+<pre lang="fennel"><code>(fstring! {str})
 </pre></code>
 
-Wrapper around string.format, works like javascript's template literates
+Wrapper around string.format, works like javascript's template literates.
 
 - `${...}` is parsed as variable
 - `$(...)` is parsed as fennel code
 
 ##### Examples:
-```clojure
+```fennel
 (local name "foo")
 (fstring! "hello ${name}")
 
@@ -500,160 +500,160 @@ Wrapper around string.format, works like javascript's template literates
 ```
 
 #### enum!
-<pre lang="clojure"><code>(enum! {name} ...)
+<pre lang="fennel"><code>(enum! {name} ...)
 </pre></code>
 
 Defines enumerated values for names.
 
 ##### Example:
-```clojure
+```fennel
 (enum! A B C) ; A=1, B=2, C=3
 ```
 
 #### enum!
-<pre lang="clojure"><code>(time! {label} ...)
+<pre lang="fennel"><code>(time! {label} ...)
 </pre></code>
 
 Prints execution time of {...} in milliseconds.
 
 ##### Example:
-```clojure
+```fennel
 (time! :add
   (+ 1 2)) ; add: [XXX]ms
 ```
 
 ## checking values
-```clojure
+```fennel
 (nil? {x})
 ```
-> checks if value of {x} is nil
+> checks if value of {x} is nil.
 
-```clojure
+```fennel
 (empty? {x})
 ```
-> checks if {x} :: [string or table] is empty
+> checks if {x} :: [string or table] is empty.
 
-```clojure
+```fennel
 (boolean? {x})
 ```
-> checks if {x} is of boolean type
+> checks if {x} is of boolean type.
 
-```clojure
+```fennel
 (string? {x})
 ```
-> checks if {x} is of string type
+> checks if {x} is of string type.
 
-```clojure
+```fennel
 (number? {x})
 ```
-> checks if {x} is of number type
+> checks if {x} is of number type.
 
-```clojure
+```fennel
 (odd? {int})
 ```
-> checks if {int} is of odd parity
+> checks if {int} is of odd parity.
 
-```clojure
+```fennel
 (even? {int})
 ```
-> checks if {int} is of even parity
+> checks if {int} is of even parity.
 
-```clojure
+```fennel
 (fn? {x})
 ```
-> checks if {x} is of function type
+> checks if {x} is of function type.
 
-```clojure
+```fennel
 (table? {x})
 ```
-> checks if {x} is of table type
+> checks if {x} is of table type.
 
-```clojure
+```fennel
 (seq? {tbl})
 ```
-> checks if {tbl} is valid list / array
+> checks if {tbl} is valid list / array.
 
 ## number
-```clojure
+```fennel
 (inc! {int})
 ```
-> increments {int} by 1 and returns its value
+> increments {int} by 1 and returns its value.
 
-```clojure
+```fennel
 (++ {var})
 ```
-> increments variable {var} by 1 and returns its value
+> increments variable {var} by 1 and returns its value.
 
-```clojure
+```fennel
 (dec! {int})
 ```
-> decrements {int} by 1 and returns its value
+> decrements {int} by 1 and returns its value.
 
-```clojure
+```fennel
 (-- {var})
 ```
-> decrements variable {var} by 1 and returns its value
+> decrements variable {var} by 1 and returns its value.
 
 ## string
-```clojure
+```fennel
 (append! {var} {str})
 ```
-> appends {str} to variable {var}
+> appends {str} to variable {var}.
 
-```clojure
+```fennel
 (tappend! {tbl} {key} {str})
 ```
-> appends {str} to {key} of table {tbl}
+> appends {str} to {key} of table {tbl}.
 
-```clojure
+```fennel
 (prepend! {var} {str})
 ```
-> prepends {str} to variable {var}
+> prepends {str} to variable {var}.
 
-```clojure
+```fennel
 (tprepend! {tbl} {key} {str})
 ```
-> prepends {str} to {key} of table {tbl}
+> prepends {str} to {key} of table {tbl}.
 
-```clojure
+```fennel
 (split! {str} {sep})
 ```
 > splits {str} into a list at each {sep}.
 
 ## table
-```clojure
+```fennel
 (tmap! {tbl} {handler})
 ```
 > maps values in {tbl} with {handler}.
 >
 > {handler} takes in (key, val) and returns a new value.
 
-```clojure
+```fennel
 (filter! {list} {handler})
 ```
 > filters values in {list} with {handler}.
 >
 > {handler} takes in (val) and returns a boolean.
 
-```clojure
+```fennel
 (merge-list! {list1} {list2})
 ```
-> merges all values of {list1} and {list2} together, and returns a new list
+> merges all values of {list1} and {list2} together, and returns a new list.
 
-```clojure
+```fennel
 (merge-tbl! {tbl1} {tbl2})
 ```
-> merges {tbl2} onto {tbl1}, and returns a new table
+> merges {tbl2} onto {tbl1}, and returns a new table.
 
-```clojure
+```fennel
 (merge! {tbl1} {tbl2})
 ```
-> merges {tbl1} and {tbl2}, correctly appending lists
+> merges {tbl1} and {tbl2}, correctly appending lists.
 
-```clojure
+```fennel
 (vmerge! {var} {tbl})
 ```
-> merges values of {tbl} onto variable {var}
+> merges values of {tbl} onto variable {var}.
 
 # End Credits
 - [aniseed](https://github.com/Olical/aniseed): for introducing me to fennel
