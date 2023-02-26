@@ -15,6 +15,8 @@ Table of Contents                                 *hibiscus-table-of-contents*
   - vim options                                         |hibiscus-vim-options|
   - variables                                             |hibiscus-variables|
 5. Core Macros                                          |hibiscus-core-macros|
+  - OOP                                                         |hibiscus-oop|
+  - class!                                                   |hibiscus-class!|
   - general                                                 |hibiscus-general|
   - checking values                                 |hibiscus-checking-values|
   - number                                                   |hibiscus-number|
@@ -25,19 +27,18 @@ Table of Contents                                 *hibiscus-table-of-contents*
 ==============================================================================
 1. Hibiscus.nvim                                      *hibiscus-hibiscus.nvim*
 
-
-  :hibiscus: Highly opinionated macros to elegantly write your neovim config.
-
+Highly opinionated macros to elegantly write your neovim config.
 
 Companion library for tangerine
 <https://github.com/udayvir-singh/tangerine.nvim>, but it can also be used
 standalone.
 
+
 RATIONAL                                                   *hibiscus-rational*
 
 
-- :candy: Syntactic eye candy over hellscape of lua api
-- :tanabata_tree: Provides missing features in both fennel and nvim api
+- Syntactic eye candy over hellscape of lua api
+- Provides missing features in both fennel and nvim api
 
 
 ==============================================================================
@@ -46,8 +47,7 @@ RATIONAL                                                   *hibiscus-rational*
 
 - Create file `plugin/0-tangerine.lua` to bootstrap hibiscus:
 
-
->
+>lua
     -- ~/.config/nvim/plugin/0-tangerine.lua
     
     -- pick your plugin manager, default [standalone]
@@ -78,33 +78,28 @@ RATIONAL                                                   *hibiscus-rational*
 <
 
 
-
 - Require a macro library at top of your modules:
 
-
->
+>fennel
     ; require all macros
     (require-macros :hibiscus.core)
     (require-macros :hibiscus.vim)
     
-    ; require selected macros
-    (import-macros {: fstring!} :hibiscus.core)
+    ; require specific macros (you can also rename them)
+    (import-macros {:fstring! f!} :hibiscus.core)
     (import-macros {: map!}    :hibiscus.vim)
 <
 
-
-:tada: now start using these macros in your config
+now start using these macros in your config
 
 ------------------------------------------------------------------------------
 
-                                                             *hibiscus-Packer*
+PACKER ~
 
-Packer                                 You can use packer to manage hibiscus
-                                       afterwards [only do this if you
-                                       haven’t used ref option in bootstrap]:
+You can use packer to manage hibiscus afterwards [use this if you haven’t
+used `ref` option in bootstrap]:
 
-
->
+>fennel
     (require-macros :hibiscus.packer)
     
     (packer-setup!)
@@ -114,9 +109,9 @@ Packer                                 You can use packer to manage hibiscus
 <
 
 
-                                                                *hibiscus-Paq*
+PAQ ~
 
->
+>fennel
     (local paq (require :paq))
     
     (paq {
@@ -128,32 +123,32 @@ Packer                                 You can use packer to manage hibiscus
 ==============================================================================
 3. Packer Macros                                      *hibiscus-packer-macros*
 
->
+>fennel
     (require-macros :hibiscus.packer)
 <
 
 
-                                                      *hibiscus-packer-setup!*
+packer-setup!                                                  *packer-setup!*
 
-packer-setup!                          (packer-setup! {opts*})
-
+(packer-setup! {opts*})
 
 Bootstraps packer and calls packer.init function with {opts*}.
 
-                                                            *hibiscus-packer!*
 
-packer!                                (packer! {…})
+packer!                                                              *packer!*
 
+(packer! {…})
 
 Wrapper around packer.startup function, automatically adds packer to plugin
 list and syncs it.
 
-                                                               *hibiscus-use!*
 
-use!                                   (use! {name} {…opts})
+use!                                                                    *use!*
 
+(use! {name} {…opts})
 
-Much more lisp friendly wrapper over packer.use function.
+Much more lisp friendly wrapper over `packer.use` function.
+
 
 EXTRA OPTIONS: ~
 
@@ -164,7 +159,7 @@ EXTRA OPTIONS: ~
 
 EXAMPLES: ~
 
->
+>fennel
     (packer!
       (use! :udayvir-singh/hibiscus.nvim)
     
@@ -182,7 +177,7 @@ EXAMPLES: ~
 ==============================================================================
 4. Neovim Macros                                      *hibiscus-neovim-macros*
 
->
+>fennel
     (require-macros :hibiscus.vim)
     ; or
     (import-macros {: augroup!} :hibiscus.vim)
@@ -191,22 +186,22 @@ EXAMPLES: ~
 
 KEYMAPS                                                     *hibiscus-keymaps*
 
-                                                               *hibiscus-map!*
 
-map!                                   (map! {args} {lhs} {rhs} {desc*})
+map!                                                                    *map!*
 
+(map! {args} {lhs} {rhs} {desc*})
 
-Defines vim keymap for the given modes from {lhs} to {rhs}
+Defines vim keymap for the given modes from {lhs} to {rhs}.
+
 
 ARGUMENTS: ~
 
 {args} can contain the following values:
 
->
+>fennel
     ; modes |                   options                           |
     [ nivcx  :remap :verbose :buffer :nowait :expr :unique :script ]
 <
-
 
 
 - `verbose`: opposite to `silent`
@@ -215,7 +210,7 @@ ARGUMENTS: ~
 
 EXAMPLES: ~
 
->
+>fennel
     ;; -------------------- ;;
     ;;      VIMSCRIPT       ;;
     ;; -------------------- ;;
@@ -238,26 +233,27 @@ EXAMPLES: ~
 
 AUTOCMDS                                                   *hibiscus-autocmds*
 
-                                                           *hibiscus-augroup!*
 
-augroup!                               (augroup! {name} {cmds})
+augroup!                                                            *augroup!*
 
+(augroup! {name} {cmds})
 
 Defines autocmd group of {name} with {cmds} containing [args pattern cmd]
-chunks
+chunks.
+
 
 ARGUMENTS: ~
 
 {args} can contain the following values:
 
->
+>fennel
     [ :nested :once :desc <desc> BufRead Filetype ...etc ]
 <
 
 
 EXAMPLES: ~
 
->
+>fennel
     ;; -------------------- ;;
     ;;      VIMSCRIPT       ;;
     ;; -------------------- ;;
@@ -293,18 +289,19 @@ EXAMPLES: ~
 
 COMMANDS                                                   *hibiscus-commands*
 
-                                                           *hibiscus-command!*
 
-command!                               (command! {args} {lhs} {rhs})
+command!                                                            *command!*
 
+(command! {args} {lhs} {rhs})
 
-Defines user command {lhs} to {rhs}
+Defines user command {lhs} to {rhs}.
+
 
 ARGUMENTS: ~
 
 {args} can contain the same opts as `nvim_create_user_command`:
 
->
+>fennel
     [
       :bar      <boolean>
       :bang     <boolean>
@@ -321,7 +318,7 @@ ARGUMENTS: ~
 
 EXAMPLES: ~
 
->
+>fennel
     ;; -------------------- ;;
     ;;      VIMSCRIPT       ;;
     ;; -------------------- ;;
@@ -334,7 +331,7 @@ EXAMPLES: ~
     (fn greet [opts]
       (print :hello opts.args))
     
-    (command! [:nargs 1 :complete #["world"]] :Greet 'greet) ; quoting is optional
+    (command! [:nargs 1 :complete #["world"]] :Greet 'greet) ; quoting is optional in command! macro
     
     (command! [:bang true] :Lhs #(print $.bang))
 <
@@ -342,32 +339,33 @@ EXAMPLES: ~
 
 MISC                                                           *hibiscus-misc*
 
-                                                              *hibiscus-exec!*
 
-exec!                                  (exec! {fn} …)
+exec!                                                                  *exec!*
 
+(exec! {…})
 
-Converts functions into valid vim.cmd calls.
+Converts function calls in {…} to valid `vim.cmd` calls.
+
 
 EXAMPLE: ~
 
->
+>fennel
     (exec!
       (set "nowrap")
       (hi! "link" "TSInclude" "Special"))
 <
 
 
-                                                            *hibiscus-concat!*
+concat!                                                              *concat!*
 
-concat!                                (concat! {list} {sep})
+(concat! {list} {sep})
 
+Concats strings in {list} with {sep} at compile time.
 
-Concats strings in {list} with {sep} at compile time
 
 EXAMPLES: ~
 
->
+>fennel
     (concat! ["hello" "foo"] " ") ; -> "hello foo"
     
     (concat! ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
@@ -376,13 +374,12 @@ EXAMPLES: ~
 
 VIM OPTIONS                                             *hibiscus-vim-options*
 
-                                                               *hibiscus-set!*
 
-set!                                   Works like command `:set`, sets vim
-                                       option {name}
+set!                                                                    *set!*
 
+Works like command `:set`, sets vim option {name}.
 
->
+>fennel
     (set! nobackup)
     (set! tabstop 4)
     
@@ -391,92 +388,79 @@ set!                                   Works like command `:set`, sets vim
 <
 
 
-                                                          *hibiscus-setlocal!*
+setlocal!                                                          *setlocal!*
 
-setlocal!                              Works like command `:setlocal`, sets
-                                       local vim option {name}
+Works like command `:setlocal`, sets local vim option {name}.
 
-
->
+>fennel
     (setlocal! filetype "md")
     (setlocal! number)
 <
 
 
-                                                         *hibiscus-setglobal!*
+setglobal!                                                        *setglobal!*
 
-setglobal!                             Works like command `:setglobal`, sets
-                                       only the global vim option {name}
-                                       without changing the local value
+Works like command `:setglobal`, sets global vim option {name} without changing
+the local value.
 
-
->
+>fennel
     (setglobal! wrap)
 <
 
 
-                                                               *hibiscus-set+*
+set+                                                                    *set+*
 
-set+                                   Appends {val} to string-style option
-                                       {name}
+Appends {val} to string-style option {name}.
 
-
->
+>fennel
     (set+ wildignore "*.foo")
 <
 
 
-                                                               *hibiscus-set^*
+set^                                                                    *set^*
 
-set^                                   Prepends {val} to string-style option
-                                       {name}
+Prepends {val} to string-style option {name}.
 
-
->
+>fennel
     (set^ wildignore ["*.foo" "*.baz"])
 <
 
 
-                                                               *hibiscus-rem!*
+rem!                                                                    *rem!*
 
-rem!                                   Removes {val} from string-style option
-                                       {name}
+Removes {val} from string-style option {name}.
 
-
->
+>fennel
     (rem! wildignore "*.baz")
 <
 
 
-                                                             *hibiscus-color!*
+color!                                                                *color!*
 
-color!                                 Sets vim colorscheme to {name}
+Sets vim colorscheme to {name}.
 
-
->
+>fennel
     (color! desert)
 <
 
 
 VARIABLES                                                 *hibiscus-variables*
 
-                                                                 *hibiscus-g!*
 
-g!                                     Sets global variable {name} to {val}.
+g!                                                                        *g!*
 
+Sets global variable {name} to {val}.
 
->
+>fennel
     (g! mapleader " ")
 <
 
 
-                                                                 *hibiscus-b!*
+b!                                                                        *b!*
 
-b!                                     Sets buffer scoped variable {name} to
-                                       {val}.
+Sets buffer scoped variable {name} to {val}.
 
-
->
+>fennel
     (b! gretting "Hello World!")
 <
 
@@ -484,35 +468,157 @@ b!                                     Sets buffer scoped variable {name} to
 ==============================================================================
 5. Core Macros                                          *hibiscus-core-macros*
 
->
+>fennel
     (require-macros :hibiscus.core)
     ; or
     (import-macros {: fstring} :hibiscus.core)
 <
 
 
+OOP                                                             *hibiscus-oop*
+
+
+CLASS!                                                       *hibiscus-class!*
+
+(class! {name} {…})
+
+Defines a new class (object-oriented programming) with {name}.
+
+An `init` method must be present in all classes and it should return the base
+table for class.
+
+To create a instance of class, call `new` method on {name}.
+
+
+EXAMPLES: ~
+
+>fennel
+    ;; -------------------- ;;
+    ;;   DEFINING CLASSES   ;;
+    ;; -------------------- ;;
+    (class! stack
+      (method! init [list] list) ; arguments of new method are passed here
+    
+      (method! push [val]
+        "inserts {val} into the stack."
+        (table.insert self val)) ; self variable is accessible from all methods
+    
+      (metamethod! __tostring []
+        "converts stack into a string."
+        (table.concat self " ")))
+    
+    (class! stack-stream
+      (local state {:cursor 0})
+    
+      (method! init [stack]
+        (set state.len (# stack)) ; private state
+        {: stack})                ; public state
+    
+      (method! next []
+        "returns next item from stream."
+        (++ state.cursor)
+        (assert (<= state.cursor state.len)
+                "stack-stream: attempt to call next() on empty stream.")
+        (. self.stack state.cursor)))
+    
+    
+    ;; -------------------- ;;
+    ;;         DEMO         ;;
+    ;; -------------------- ;;
+    (local st (stack:new [:a :b])) ; new method should be called to create a instance
+    (st:push :c)
+    (print (tostring st)) ; > "a b c"
+    
+    (local stream (stack-stream:new st))
+    (print (stream:next)) ; > "a"
+    (print (stream:next)) ; > "b"
+<
+
+
+method!                                                              *method!*
+
+(method! {name} {args} {…})
+
+Defines a method within the scope of class.
+
+The `self` variable is accessible from the scope of every method.
+
+
+EXAMPLE: ~
+
+>fennel
+    (class! foo
+      (method! init [] {}) ; required for all classes
+    
+      (method! hello []
+        (print "hello world!")))
+<
+
+
+metamethod!                                                      *metamethod!*
+
+(metamethod! {name} {args} {…})
+
+Defines a metamethod within the scope of class.
+
+The `self` variable is accessible from the scope of every metamethod.
+
+See lua docs for list of valid metamethods.
+
+
+EXAMPLE: ~
+
+>fennel
+    (class! foo
+      (method! init [] {}) ; required for all classes
+    
+      (metamethod! __tostring []
+        "example_string"))
+<
+
+
+instanceof?                                                      *instanceof?*
+
+(instanceof? {val} {class})
+
+Checks if {val} is an instance of {class}.
+
+
+EXAMPLE: ~
+
+>fennel
+    (class! foo
+      (method! init [] {}))
+    
+    (local x (foo:new))
+    
+    (instanceof? x foo)  ; > true
+    (instanceof? {} foo) ; > false
+<
+
+
 GENERAL                                                     *hibiscus-general*
 
-                                                              *hibiscus-dump!*
 
-dump!                                  (dump! {…})
+dump!                                                                  *dump!*
 
+(dump! {…})
 
-Pretty prints {…} into human readable form
-
-                                                                *hibiscus-or=*
-
-or=                                    (or= {x} {…})
+Pretty prints {…} into human readable form.
 
 
-Checks if {x} is equal to any one of {…}
+or=                                                                      *or=*
 
-                                                           *hibiscus-fstring!*
+(or= {x} {…})
 
-fstring!                               (fstring! {str})
+Checks if {x} is equal to any one of {…}.
 
 
-Wrapper around string.format, works like javascript’s template literates
+fstring!                                                            *fstring!*
+
+(fstring! {str})
+
+Wrapper around string.format, works like javascript’s template literates.
 
 
 - `${...}` is parsed as variable
@@ -521,7 +627,7 @@ Wrapper around string.format, works like javascript’s template literates
 
 EXAMPLES: ~
 
->
+>fennel
     (local name "foo")
     (fstring! "hello ${name}")
     
@@ -529,253 +635,197 @@ EXAMPLES: ~
 <
 
 
-                                                              *hibiscus-enum!*
+enum!                                                                  *enum!*
 
-enum!                                  (enum! {name} …)
-
+(enum! {name} …)
 
 Defines enumerated values for names.
 
+
 EXAMPLE: ~
 
->
+>fennel
     (enum! A B C) ; A=1, B=2, C=3
+<
+
+
+time!                                                                  *time!*
+
+(time! {label} …)
+
+Prints execution time of {…} in milliseconds.
+
+
+EXAMPLE: ~
+
+>fennel
+    (time! :add
+      (+ 1 2)) ; add: [XXX]ms
 <
 
 
 CHECKING VALUES                                     *hibiscus-checking-values*
 
->
+>fennel
     (nil? {x})
 <
 
+checks if value of {x} is nil.
 
-
-  checks if value of {x} is nil
-
-
->
+>fennel
     (empty? {x})
 <
 
+checks if {x} :: [string or table] is empty.
 
-
-  checks if {x} :: [string or table] is empty
-
-
->
+>fennel
     (boolean? {x})
 <
 
+checks if {x} is of boolean type.
 
-
-  checks if {x} is of boolean type
-
-
->
+>fennel
     (string? {x})
 <
 
+checks if {x} is of string type.
 
-
-  checks if {x} is of string type
-
-
->
+>fennel
     (number? {x})
 <
 
+checks if {x} is of number type.
 
-
-  checks if {x} is of number type
-
-
->
+>fennel
     (odd? {int})
 <
 
+checks if {int} is of odd parity.
 
-
-  checks if {int} is of odd parity
-
-
->
+>fennel
     (even? {int})
 <
 
+checks if {int} is of even parity.
 
-
-  checks if {int} is of even parity
-
-
->
+>fennel
     (fn? {x})
 <
 
+checks if {x} is of function type.
 
-
-  checks if {x} is of function type
-
-
->
+>fennel
     (table? {x})
 <
 
+checks if {x} is of table type.
 
-
-  checks if {x} is of table type
-
-
->
+>fennel
     (seq? {tbl})
 <
 
-
-
-  checks if {tbl} is valid list / array
+checks if {tbl} is valid list / array.
 
 
 NUMBER                                                       *hibiscus-number*
 
->
+>fennel
     (inc! {int})
 <
 
+increments {int} by 1 and returns its value.
 
-
-  increments {int} by 1 and returns its value
-
-
->
+>fennel
     (++ {var})
 <
 
+increments variable {var} by 1 and returns its value.
 
-
-  increments variable {var} by 1 and returns its value
-
-
->
+>fennel
     (dec! {int})
 <
 
+decrements {int} by 1 and returns its value.
 
-
-  decrements {int} by 1 and returns its value
-
-
->
+>fennel
     (-- {var})
 <
 
-
-
-  decrements variable {var} by 1 and returns its value
+decrements variable {var} by 1 and returns its value.
 
 
 STRING                                                       *hibiscus-string*
 
->
+>fennel
     (append! {var} {str})
 <
 
+appends {str} to variable {var}.
 
-
-  appends {str} to variable {var}
-
-
->
+>fennel
     (tappend! {tbl} {key} {str})
 <
 
+appends {str} to {key} of table {tbl}.
 
-
-  appends {str} to {key} of table {tbl}
-
-
->
+>fennel
     (prepend! {var} {str})
 <
 
+prepends {str} to variable {var}.
 
-
-  prepends {str} to variable {var}
-
-
->
+>fennel
     (tprepend! {tbl} {key} {str})
 <
 
+prepends {str} to {key} of table {tbl}.
 
-
-  prepends {str} to {key} of table {tbl}
-
-
->
+>fennel
     (split! {str} {sep})
 <
 
-
-
-  splits {str} into a list at each {sep}.
+splits {str} into a list at each {sep}.
 
 
 TABLE                                                         *hibiscus-table*
 
->
+>fennel
     (tmap! {tbl} {handler})
 <
 
+maps values in {tbl} with {handler}. > {handler} takes in (key, val) and
+returns a new value.
 
-
-  maps values in {tbl} with {handler}.
-  {handler} takes in (key, val) and returns a new value.
-
-
->
+>fennel
     (filter! {list} {handler})
 <
 
+filters values in {list} with {handler}. > {handler} takes in (val) and returns
+a boolean.
 
-
-  filters values in {list} with {handler}.
-  {handler} takes in (val) and returns a boolean.
-
-
->
+>fennel
     (merge-list! {list1} {list2})
 <
 
+merges all values of {list1} and {list2} together, and returns a new list.
 
-
-  merges all values of {list1} and {list2} together, and returns a new list
-
-
->
+>fennel
     (merge-tbl! {tbl1} {tbl2})
 <
 
+merges {tbl2} onto {tbl1}, and returns a new table.
 
-
-  merges {tbl2} onto {tbl1}, and returns a new table
-
-
->
+>fennel
     (merge! {tbl1} {tbl2})
 <
 
+merges {tbl1} and {tbl2}, correctly appending lists.
 
-
-  merges {tbl1} and {tbl2}, correctly appending lists
-
-
->
+>fennel
     (vmerge! {var} {tbl})
 <
 
-
-
-  merges values of {tbl} onto variable {var}
+merges values of {tbl} onto variable {var}.
 
 
 ==============================================================================
@@ -784,7 +834,6 @@ TABLE                                                         *hibiscus-table*
 
 - aniseed <https://github.com/Olical/aniseed>: for introducing me to fennel
 - zest <https://github.com/tsbohc/zest.nvim>: for inspiring `hibiscus.vim` macros
-
 
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 

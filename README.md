@@ -1,4 +1,5 @@
 # Hibiscus.nvim
+
 > :hibiscus: Highly opinionated macros to elegantly write your neovim config.
 
 Companion library for [tangerine](https://github.com/udayvir-singh/tangerine.nvim),
@@ -8,11 +9,14 @@ but it can also be used standalone.
 ![Neovim version](https://img.shields.io/badge/For_Neovim-0.8-dab?style=for-the-badge&logo=neovim&logoColor=dab)
 
 ## Rational
+
 - :candy: Syntactic eye candy over hellscape of lua api
 - :tanabata_tree: Provides missing features in both fennel and nvim api
 
 # Installation
+
 - Create file `plugin/0-tangerine.lua` to bootstrap hibiscus:
+
 ```lua
 -- ~/.config/nvim/plugin/0-tangerine.lua
 
@@ -44,6 +48,7 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
 ```
 
 - Require a macro library at top of your modules:
+
 ```fennel
 ; require all macros
 (require-macros :hibiscus.core)
@@ -58,7 +63,8 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
 
 ---
 
-#### Packer
+### Packer
+
 You can use packer to manage hibiscus afterwards [use this if you haven't used `ref` option in bootstrap]:
 
 ```fennel
@@ -70,7 +76,8 @@ You can use packer to manage hibiscus afterwards [use this if you haven't used `
   (use! :udayvir-singh/hibiscus.nvim))
 ```
 
-#### Paq
+### Paq
+
 ```fennel
 (local paq (require :paq))
 
@@ -80,33 +87,39 @@ You can use packer to manage hibiscus afterwards [use this if you haven't used `
 ```
 
 # Packer Macros
+
 ```fennel
 (require-macros :hibiscus.packer)
 ```
 
 #### packer-setup!
+
 <pre lang="fennel"><code>(packer-setup! {opts?})
 </pre></code>
 
 Bootstraps packer and calls packer.init function with {opts?}.
 
 #### packer!
+
 <pre lang="fennel"><code>(packer! {...})
 </pre></code>
 
 Wrapper around packer.startup function, automatically adds packer to plugin list and syncs it.
 
 #### use!
+
 <pre lang="fennel"><code>(use! {name} {...opts})
 </pre></code>
 
 Much more lisp friendly wrapper over `packer.use` function.
 
 ##### Extra Options:
+
 - `require` -- wrapper around `config`, loads string or list of module names.
 - `depends` -- wrapper around `requires`, configures plugin dependencies with lisp friendly syntax.
 
 ##### Examples:
+
 ```fennel
 (packer!
   (use! :udayvir-singh/hibiscus.nvim)
@@ -122,6 +135,7 @@ Much more lisp friendly wrapper over `packer.use` function.
 ```
 
 # Neovim Macros
+
 ```fennel
 (require-macros :hibiscus.vim)
 ; or
@@ -129,14 +143,18 @@ Much more lisp friendly wrapper over `packer.use` function.
 ```
 
 ## keymaps
+
 #### map!
+
 <pre lang="fennel"><code>(map! {args} {lhs} {rhs} {desc?})
 </pre></code>
 
 Defines vim keymap for the given modes from {lhs} to {rhs}.
 
 ##### Arguments:
+
 {args} can contain the following values:
+
 ```fennel
 ; modes |                   options                           |
 [ nivcx  :remap :verbose :buffer :nowait :expr :unique :script ]
@@ -146,6 +164,7 @@ Defines vim keymap for the given modes from {lhs} to {rhs}.
 - `remap`: opposite to `noremap`
 
 ##### Examples:
+
 ```fennel
 ;; -------------------- ;;
 ;;      VIMSCRIPT       ;;
@@ -167,20 +186,24 @@ Defines vim keymap for the given modes from {lhs} to {rhs}.
 ```
 
 ## autocmds
+
 #### augroup!
+
 <pre lang="fennel"><code>(augroup! {name} {cmds})
 </pre></code>
 
 Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks.
 
 ##### Arguments:
+
 {args} can contain the following values:
+
 ```fennel
 [ :nested :once :desc <desc> BufRead Filetype ...etc ]
 ```
 
-
 ##### Examples:
+
 ```fennel
 ;; -------------------- ;;
 ;;      VIMSCRIPT       ;;
@@ -215,14 +238,18 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 ```
 
 ## commands
+
 #### command!
+
 <pre lang="fennel"><code>(command! {args} {lhs} {rhs})
 </pre></code>
 
 Defines user command {lhs} to {rhs}.
 
 ##### Arguments:
+
 {args} can contain the same opts as `nvim_create_user_command`:
+
 ```fennel
 [
   :bar      <boolean>
@@ -238,6 +265,7 @@ Defines user command {lhs} to {rhs}.
 ```
 
 ##### Examples:
+
 ```fennel
 ;; -------------------- ;;
 ;;      VIMSCRIPT       ;;
@@ -251,19 +279,22 @@ Defines user command {lhs} to {rhs}.
 (fn greet [opts]
   (print :hello opts.args))
 
-(command! [:nargs 1 :complete #["world"]] :Greet 'greet) ; quoting is optional
+(command! [:nargs 1 :complete #["world"]] :Greet 'greet) ; quoting is optional in command! macro
 
 (command! [:bang true] :Lhs #(print $.bang))
 ```
 
 ## misc
+
 #### exec!
-<pre lang="fennel"><code>(exec! {fn} ...)
+
+<pre lang="fennel"><code>(exec! {...})
 </pre></code>
 
-Converts functions into valid vim.cmd calls.
+Converts function calls in {...} to valid `vim.cmd` calls.
 
 ##### Example:
+
 ```fennel
 (exec!
   (set "nowrap")
@@ -271,12 +302,14 @@ Converts functions into valid vim.cmd calls.
 ```
 
 #### concat!
+
 <pre lang="fennel"><code>(concat! {list} {sep})
 </pre></code>
 
 Concats strings in {list} with {sep} at compile time.
 
 ##### Examples:
+
 ```fennel
 (concat! ["hello" "foo"] " ") ; -> "hello foo"
 
@@ -284,7 +317,9 @@ Concats strings in {list} with {sep} at compile time.
 ```
 
 ## vim options
+
 #### set!
+
 Works like command `:set`, sets vim option {name}.
 
 ```fennel
@@ -296,6 +331,7 @@ Works like command `:set`, sets vim option {name}.
 ```
 
 #### setlocal!
+
 Works like command `:setlocal`, sets local vim option {name}.
 
 ```fennel
@@ -304,6 +340,7 @@ Works like command `:setlocal`, sets local vim option {name}.
 ```
 
 #### setglobal!
+
 Works like command `:setglobal`, sets global vim option {name} without changing the local value.
 
 ```fennel
@@ -311,6 +348,7 @@ Works like command `:setglobal`, sets global vim option {name} without changing 
 ```
 
 #### set+
+
 Appends {val} to string-style option {name}.
 
 ```fennel
@@ -318,6 +356,7 @@ Appends {val} to string-style option {name}.
 ```
 
 #### set^
+
 Prepends {val} to string-style option {name}.
 
 ```fennel
@@ -325,6 +364,7 @@ Prepends {val} to string-style option {name}.
 ```
 
 #### rem!
+
 Removes {val} from string-style option {name}.
 
 ```fennel
@@ -332,6 +372,7 @@ Removes {val} from string-style option {name}.
 ```
 
 #### color!
+
 Sets vim colorscheme to {name}.
 
 ```fennel
@@ -339,7 +380,9 @@ Sets vim colorscheme to {name}.
 ```
 
 ## variables
+
 #### g!
+
 Sets global variable {name} to {val}.
 
 ```fennel
@@ -347,6 +390,7 @@ Sets global variable {name} to {val}.
 ```
 
 #### b!
+
 Sets buffer scoped variable {name} to {val}.
 
 ```fennel
@@ -354,6 +398,7 @@ Sets buffer scoped variable {name} to {val}.
 ```
 
 # Core Macros
+
 ```fennel
 (require-macros :hibiscus.core)
 ; or
@@ -363,6 +408,7 @@ Sets buffer scoped variable {name} to {val}.
 ## OOP
 
 ## class!
+
 <pre lang="fennel"><code>(class! {name} {...})
 </pre></code>
 
@@ -373,6 +419,7 @@ An `init` method must be present in all classes and it should return the base ta
 To create a instance of class, call `new` method on {name}.
 
 ##### Examples:
+
 ```fennel
 ;; -------------------- ;;
 ;;   DEFINING CLASSES   ;;
@@ -416,6 +463,7 @@ To create a instance of class, call `new` method on {name}.
 ```
 
 #### method!
+
 <pre lang="fennel"><code>(method! {name} {args} {...})
 </pre></code>
 
@@ -424,6 +472,7 @@ Defines a method within the scope of class.
 The `self` variable is accessible from the scope of every method.
 
 ##### Example:
+
 ```fennel
 (class! foo
   (method! init [] {}) ; required for all classes
@@ -433,6 +482,7 @@ The `self` variable is accessible from the scope of every method.
 ```
 
 #### metamethod!
+
 <pre lang="fennel"><code>(metamethod! {name} {args} {...})
 </pre></code>
 
@@ -443,6 +493,7 @@ The `self` variable is accessible from the scope of every metamethod.
 See lua docs for list of valid metamethods.
 
 ##### Example:
+
 ```fennel
 (class! foo
   (method! init [] {}) ; required for all classes
@@ -452,12 +503,14 @@ See lua docs for list of valid metamethods.
 ```
 
 #### instanceof?
+
 <pre lang="fennel"><code>(instanceof? {val} {class})
 </pre></code>
 
 Checks if {val} is an instance of {class}.
 
 ##### Example:
+
 ```fennel
 (class! foo
   (method! init [] {}))
@@ -471,18 +524,21 @@ Checks if {val} is an instance of {class}.
 ## general
 
 #### dump!
+
 <pre lang="fennel"><code>(dump! {...})
 </pre></code>
 
 Pretty prints {...} into human readable form.
 
 #### or=
+
 <pre lang="fennel"><code>(or= {x} {...})
 </pre></code>
 
 Checks if {x} is equal to any one of {...}.
 
 #### fstring!
+
 <pre lang="fennel"><code>(fstring! {str})
 </pre></code>
 
@@ -492,6 +548,7 @@ Wrapper around string.format, works like javascript's template literates.
 - `$(...)` is parsed as fennel code
 
 ##### Examples:
+
 ```fennel
 (local name "foo")
 (fstring! "hello ${name}")
@@ -500,130 +557,158 @@ Wrapper around string.format, works like javascript's template literates.
 ```
 
 #### enum!
+
 <pre lang="fennel"><code>(enum! {name} ...)
 </pre></code>
 
 Defines enumerated values for names.
 
 ##### Example:
+
 ```fennel
 (enum! A B C) ; A=1, B=2, C=3
 ```
 
-#### enum!
+#### time!
+
 <pre lang="fennel"><code>(time! {label} ...)
 </pre></code>
 
 Prints execution time of {...} in milliseconds.
 
 ##### Example:
+
 ```fennel
 (time! :add
   (+ 1 2)) ; add: [XXX]ms
 ```
 
 ## checking values
+
 ```fennel
 (nil? {x})
 ```
+
 > checks if value of {x} is nil.
 
 ```fennel
 (empty? {x})
 ```
+
 > checks if {x} :: [string or table] is empty.
 
 ```fennel
 (boolean? {x})
 ```
+
 > checks if {x} is of boolean type.
 
 ```fennel
 (string? {x})
 ```
+
 > checks if {x} is of string type.
 
 ```fennel
 (number? {x})
 ```
+
 > checks if {x} is of number type.
 
 ```fennel
 (odd? {int})
 ```
+
 > checks if {int} is of odd parity.
 
 ```fennel
 (even? {int})
 ```
+
 > checks if {int} is of even parity.
 
 ```fennel
 (fn? {x})
 ```
+
 > checks if {x} is of function type.
 
 ```fennel
 (table? {x})
 ```
+
 > checks if {x} is of table type.
 
 ```fennel
 (seq? {tbl})
 ```
+
 > checks if {tbl} is valid list / array.
 
 ## number
+
 ```fennel
 (inc! {int})
 ```
+
 > increments {int} by 1 and returns its value.
 
 ```fennel
 (++ {var})
 ```
+
 > increments variable {var} by 1 and returns its value.
 
 ```fennel
 (dec! {int})
 ```
+
 > decrements {int} by 1 and returns its value.
 
 ```fennel
 (-- {var})
 ```
+
 > decrements variable {var} by 1 and returns its value.
 
 ## string
+
 ```fennel
 (append! {var} {str})
 ```
+
 > appends {str} to variable {var}.
 
 ```fennel
 (tappend! {tbl} {key} {str})
 ```
+
 > appends {str} to {key} of table {tbl}.
 
 ```fennel
 (prepend! {var} {str})
 ```
+
 > prepends {str} to variable {var}.
 
 ```fennel
 (tprepend! {tbl} {key} {str})
 ```
+
 > prepends {str} to {key} of table {tbl}.
 
 ```fennel
 (split! {str} {sep})
 ```
+
 > splits {str} into a list at each {sep}.
 
 ## table
+
 ```fennel
 (tmap! {tbl} {handler})
 ```
+
 > maps values in {tbl} with {handler}.
 >
 > {handler} takes in (key, val) and returns a new value.
@@ -631,6 +716,7 @@ Prints execution time of {...} in milliseconds.
 ```fennel
 (filter! {list} {handler})
 ```
+
 > filters values in {list} with {handler}.
 >
 > {handler} takes in (val) and returns a boolean.
@@ -638,23 +724,28 @@ Prints execution time of {...} in milliseconds.
 ```fennel
 (merge-list! {list1} {list2})
 ```
+
 > merges all values of {list1} and {list2} together, and returns a new list.
 
 ```fennel
 (merge-tbl! {tbl1} {tbl2})
 ```
+
 > merges {tbl2} onto {tbl1}, and returns a new table.
 
 ```fennel
 (merge! {tbl1} {tbl2})
 ```
+
 > merges {tbl1} and {tbl2}, correctly appending lists.
 
 ```fennel
 (vmerge! {var} {tbl})
 ```
+
 > merges values of {tbl} onto variable {var}.
 
 # End Credits
+
 - [aniseed](https://github.com/Olical/aniseed): for introducing me to fennel
 - [zest](https://github.com/tsbohc/zest.nvim): for inspiring `hibiscus.vim` macros

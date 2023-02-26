@@ -35,29 +35,20 @@ logcat () {
 # --------------------- #
 #       PANVIMDOC       #
 # --------------------- #
-SRCDIR="./panvimdoc"
-REMOTE="https://github.com/kdheepak/panvimdoc/raw/main/scripts"
- FILES="include-files.lua inspect.lua panvimdoc.lua"
+WRITER="./panvimdoc.lua"
+REMOTE="https://github.com/kdheepak/panvimdoc/raw/main/scripts/panvimdoc.lua"
 
-DOWNLOAD=0
-for FILE in ${FILES}; do
-	[ ! -r "${SRCDIR}/${FILE}" ] && DOWNLOAD=1
-done
-
-if [ ${DOWNLOAD} -eq 1 ]; then
-	mkdir "${SRCDIR}" 2>/dev/null
-
+if [ ! -f "${WRITER}" ]; then
 	:: DOWNLOADING PANVIMDOC
-	for FILE in ${FILES}; do
-		if curl -sLJ "${REMOTE}/${FILE}" -o "${SRCDIR}/${FILE}"; then
-			log 2 "${SRCDIR}/${FILE}"
-		else
-			log 1 "${SRCDIR}/${FILE}"
-			exit 1
-		fi
-	done
+	if curl -sLJ "${REMOTE}" -o "${WRITER}"; then
+		log 2 "${WRITER}"
+	else
+		log 1 "${WRITER}"
+		exit 1
+	fi
 	:: DONE
 fi
+
 
 # --------------------- #
 #         MAIN          #
@@ -79,6 +70,13 @@ panvimdoc () {
 			ignore=Null; getline
 		}
 
+		# parse doc-tags
+		if ($2 ~ "doc=.+") {
+			doc=$2
+			getline
+			$(NF + 1)="{"doc"}"
+		}
+
 		# parse optional args
 		if ($0 ~ "{.+?}") {
 			gsub("?}", "*}", $0)
@@ -89,6 +87,12 @@ panvimdoc () {
 			$(NF + 1)="~"
 		}
 
+		# strip quotes
+		gsub("^> ", "", $0)
+
+		# strip emoji
+		gsub(":[a-z_]+:", "", $0)
+
 		# strip html blocks
 		if (! code && $1 ~ "^```") {
 			code="Yes"
@@ -97,16 +101,18 @@ panvimdoc () {
 			code=Null
 		}
 
-		if (! code && $0 ~ "[^`]<[^>]+>")
-			gsub("<[^>]+>", "", $0)
+		if (! code) gsub("<[^>]+>", "", $0)
 
 		if (! ignore) print $0
 	}' |
 	pandoc \
-		-M 'project:hibiscus' -M 'description:Opinionated fennel macros for neovim' \
-		-t           "${SRCDIR}/panvimdoc.lua" \
-		--lua-filter "${SRCDIR}/include-files.lua" \
-		--lua-filter "${SRCDIR}/inspect.lua" \
+		-M 'project:hibiscus' \
+		-M 'description:Opinionated fennel macros for neovim' \
+		-M "toc:true" \
+		-M "treesitter:true" \
+		-M "docmapping:true" \
+		-M "incrementheadinglevelby:0" \
+		-t "${WRITER}" \
 		-o "${TARGET}" 2> "${LOGFILE}"
 }
 
