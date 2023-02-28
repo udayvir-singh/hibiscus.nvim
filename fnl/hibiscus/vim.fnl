@@ -13,8 +13,10 @@
 
 (lambda quote? [x]
   "checks if 'x' is quoted value."
-  (let [ref (?. x 1 1)]
-    (= ref :quote)))
+  (if (table? x)
+      (let [ref (?. x 1 1)]
+        (= ref :quote))
+      false))
 
 (lambda dolist [lst]
   "unpacks 'lst' and wrap it within do block."
@@ -48,35 +50,66 @@
 
 
 ;; -------------------- ;;
-;;       GENERAL        ;;
+;;        CONCAT        ;;
 ;; -------------------- ;;
-(lun concat! [lst sep]
-  "smartly concats all strings in 'lst' with 'sep'."
-  (check [:seq lst :string sep])
-  (var out [])
-  (var len 1)
-  (each [i v (ipairs lst)]
-    ; ignore separator at end
-    (local sep (if (< i (# lst)) sep ""))
-    ; concat string
+(lun concat! [sep ...]
+  "smartly concats all strings in '...' with 'sep'."
+  (check [:string sep])
+  ; collect stack
+  (local vargs [...])
+  (local stack [])
+  (each [i v (ipairs vargs)]
+    (if (and (list? v) (= ".." (tostring (. v 1))))
+        (each [_ v* (ipairs (do (table.remove v 1) v))]
+          (table.insert stack v*))
+        (table.insert stack v))
+    (if (< i (# vargs))
+        (table.insert stack sep)))
+  ; generate body
+  (local out [])
+  (var cur "")
+  (lambda push-cur []
+    (if (not= "" cur)
+        (table.insert out cur))
+    (set cur ""))
+  (each [_ v (ipairs stack)]
     (if (string? v)
-        (tappend! out len (.. v sep))
-        :else
-        (do (tset out (++ len) `(.. ,v ,sep))
-            (++ len))))
+        (append! cur v)
+        (do (push-cur)
+            (table.insert out v))))
+  (push-cur)
   :return
-  (if (= len 1)
+  (if (= (# out) 1)
       (unpack out)
       (list `.. (unpack out))))
 
-(lun exec! [func ...]
-  "converts functions into valid vim.cmd calls."
-  (local args [func ...])
+
+;; -------------------- ;;
+;;         EXEC         ;;
+;; -------------------- ;;
+(lambda parse-exec [sep lst]
+  (local out [])
+  (each [_ x (ipairs lst)]
+    (if (string? x)
+        (table.insert out (.. "'" (x:gsub "'" "\\'") "'"))
+        (quote? x)
+        (table.insert out (. x 2))
+        (list? x)
+        (let [name (tostring (table.remove x 1))
+              args (parse-exec "," x)]
+          (table.insert out '(.. ,name "(" ,args ")")))
+        (table.insert out (tostring x))))
+  (concat! sep (unpack out)))
+
+(lun exec! [command ...]
+  "translates commands written in fennel to vim.cmd calls."
+  (local commands [command ...])
   (local out  [])
-  (each [_ arg (ipairs args)]
-    (check [:list arg])
-    (local cmd [(tostring (table.remove arg 1)) (unpack arg)])
-    (table.insert out `(vim.cmd ,(concat! cmd " "))))
+  (each [_ cmd (ipairs commands)]
+    (check [:fseq cmd])
+    (local head (tostring (table.remove cmd 1)))
+    (table.insert out
+      `(vim.cmd ,(concat! " " head (parse-exec " " cmd)))))
   (dolist out))
 
 
@@ -100,7 +133,8 @@
 
 (lun map! [args lhs rhs ?desc]
   "defines vim keymap for modes in 'args'."
-  (check [:real   (as mode (. args 1))
+  (check [:fseq   args
+          :real   (as mode (. args 1))
           :string (as description (or ?desc ""))])
   (local (modes opts) (parse-map-args args))
   (set opts.desc ?desc)
@@ -159,7 +193,10 @@
   (table.insert out `(local ,id (vim.api.nvim_create_augroup ,name {:clear true})))
   ; define autocmds
   (each [_ au (ipairs [...])]
-    (check [:seq (as autocmd au)])
+    (check [:fseq (as autocmd au)
+            :fseq (as events (. au 1))
+            :real (as pattern (. au 2))
+            :real (as command (. au 3))])
     (table.insert out (autocmd id au)))
   :return
   (dolist out))

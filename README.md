@@ -40,26 +40,26 @@ local function bootstrap(url, ref)
 	end
 end
 
+-- for stable version [recommended]
+bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.5")
+
 -- for git head
 bootstrap("https://github.com/udayvir-singh/hibiscus.nvim")
-
--- for stable version
-bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.5")
 ```
 
-- Require a macro library at top of your modules:
+- Require a macro library at top of your fennel modules:
 
 ```fennel
 ; require all macros
 (require-macros :hibiscus.core)
 (require-macros :hibiscus.vim)
 
-; require specific macros (you can also rename them)
+; require specific macros [you can also rename them]
 (import-macros {:fstring! f!} :hibiscus.core)
-(import-macros {: map!}    :hibiscus.vim)
+(import-macros {: map!}       :hibiscus.vim)
 ```
 
-:tada: now start using these macros in your config
+:tada: Now start using these macros in your config
 
 ---
 
@@ -177,11 +177,11 @@ Defines vim keymap for the given modes from {lhs} to {rhs}.
 ;;        FENNEL        ;;
 ;; -------------------- ;;
 (map! [nv :expr] :j
-      '(if (> vim.v.count 0) "j" "gj"))
+      `(if (> vim.v.count 0) "j" "gj"))
 
 (local greet #(print "Hello World!"))
 
-(map! [n] :gH 'greet ; optionally quote to explicitly indicate a function
+(map! [n] :gH `greet ; optionally quote to explicitly indicate a function
       "greets the world!")
 ```
 
@@ -220,7 +220,7 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
   [[BufWinEnter] ?* "silent! loadview"])
 
 (augroup! :buffer-local
-  [[Event] '(buffer 0) "echo 'hello'"])
+  [[Event] `(buffer 0) "echo 'hello'"])
 
 
 ;; -------------------- ;;
@@ -233,8 +233,8 @@ Defines autocmd group of {name} with {cmds} containing [args pattern cmd] chunks
 (local greet #(print "Hello World!"))
 
 (augroup! :greet
-  [[BufRead] *.sh '(print :HOLLA)]
-  [[BufRead] *    'hello] ; remember to quote functions to indicate they are callbacks
+  [[BufRead] *.sh `(print :HOLLA)]
+  [[BufRead] *    `hello] ; remember to quote functions to indicate they are callbacks
 ```
 
 ## commands
@@ -279,41 +279,60 @@ Defines user command {lhs} to {rhs}.
 (fn greet [opts]
   (print :hello opts.args))
 
-(command! [:nargs 1 :complete #["world"]] :Greet 'greet) ; quoting is optional in command! macro
+(command! [:nargs 1 :complete #["world"]] :Greet `greet) ; quoting is optional in command! macro
 
 (command! [:bang true] :Lhs #(print $.bang))
 ```
 
-## misc
+## vimscript
 
 #### exec!
 
 <pre lang="fennel"><code>(exec! {...})
 </pre></code>
 
-Converts function calls in {...} to valid `vim.cmd` calls.
+Translates commands written in fennel to `vim.cmd` calls.
 
 ##### Example:
 
 ```fennel
 (exec!
-  (set "nowrap")
-  (hi! "link" "TSInclude" "Special"))
+  ; setting highlights
+  [hi! link TSInclude Special]
+  [hi! DiagnosticVirtualTextError guibg=NONE]
+
+  ; calling vimscript functions
+  [echo (resolve (expand "~/path"))]
+
+  ; injecting commands by quoting [dangerous]
+  [echo `(.. "'" variable "'")])
 ```
+
+Lua output:
+```lua
+vim.cmd("hi! link TSInclude Special")
+vim.cmd("hi! DiagnosticVirtualTextError guibg=NONE")
+vim.cmd("echo resolve(expand('~/path'))")
+vim.cmd("echo '" .. variable .. "'")
+```
+
+## misc
 
 #### concat!
 
-<pre lang="fennel"><code>(concat! {list} {sep})
+<pre lang="fennel"><code>(concat! {sep} {...})
 </pre></code>
 
-Concats strings in {list} with {sep} at compile time.
+Smartly concats all values in {...} with {sep} at compile time.
+Useful for breaking down large strings without any overhead.
 
-##### Examples:
+##### Example:
 
 ```fennel
-(concat! ["hello" "foo"] " ") ; -> "hello foo"
-
-(concat! ["hello" "foo" var] " ") ; -> "hello foo" .. " " .. var
+(concat! "\n"
+  "first line"
+  "second line"
+  "third line") ; => "first line\nsecond line\nthird line"
 ```
 
 ## vim options
@@ -455,11 +474,11 @@ To create a instance of class, call `new` method on {name}.
 ;; -------------------- ;;
 (local st (stack:new [:a :b])) ; new method should be called to create a instance
 (st:push :c)
-(print (tostring st)) ; > "a b c"
+(print (tostring st)) ; => "a b c"
 
 (local stream (stack-stream:new st))
-(print (stream:next)) ; > "a"
-(print (stream:next)) ; > "b"
+(print (stream:next)) ; => "a"
+(print (stream:next)) ; => "b"
 ```
 
 #### method!
@@ -517,8 +536,8 @@ Checks if {val} is an instance of {class}.
 
 (local x (foo:new))
 
-(instanceof? x foo)  ; > true
-(instanceof? {} foo) ; > false
+(instanceof? x foo)  ; => true
+(instanceof? {} foo) ; => false
 ```
 
 ## general
@@ -654,10 +673,10 @@ Prints execution time of {...} in milliseconds.
 > increments {int} by 1 and returns its value.
 
 ```fennel
-(++ {var})
+(++ {variable})
 ```
 
-> increments variable {var} by 1 and returns its value.
+> increments {variable} by 1 and returns its value.
 
 ```fennel
 (dec! {int})
@@ -666,18 +685,18 @@ Prints execution time of {...} in milliseconds.
 > decrements {int} by 1 and returns its value.
 
 ```fennel
-(-- {var})
+(-- {variable})
 ```
 
-> decrements variable {var} by 1 and returns its value.
+> decrements {variable} by 1 and returns its value.
 
 ## string
 
 ```fennel
-(append! {var} {str})
+(append! {variable} {str})
 ```
 
-> appends {str} to variable {var}.
+> appends {str} to {variable}.
 
 ```fennel
 (tappend! {tbl} {key} {str})
@@ -686,10 +705,10 @@ Prints execution time of {...} in milliseconds.
 > appends {str} to {key} of table {tbl}.
 
 ```fennel
-(prepend! {var} {str})
+(prepend! {variable} {str})
 ```
 
-> prepends {str} to variable {var}.
+> prepends {str} to {variable}.
 
 ```fennel
 (tprepend! {tbl} {key} {str})
@@ -740,10 +759,10 @@ Prints execution time of {...} in milliseconds.
 > merges {tbl1} and {tbl2}, correctly appending lists.
 
 ```fennel
-(vmerge! {var} {tbl})
+(vmerge! {variable} {tbl})
 ```
 
-> merges values of {tbl} onto variable {var}.
+> merges values of {tbl} onto {variable}.
 
 # End Credits
 

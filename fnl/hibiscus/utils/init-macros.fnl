@@ -33,7 +33,7 @@
 ;;       CHECKING       ;;
 ;; -------------------- ;;
 (lambda assert-real [v scope]
-  "asserts if 'v' is a symbol."
+  "asserts if 'v' is not nil."
   (ass v "Missing required argument '" scope "'."))
 
 (lambda assert-even [v scope]
@@ -42,7 +42,7 @@
       "expected even number of arguments in '" scope "'."))
 
 (lambda assert-list [v scope]
-  "asserts if 'v' is a symbol."
+  "asserts if 'v' is a list."
   (ass `(list? ,v)
       "'" scope "' expected to be a function call."))
 
@@ -52,9 +52,14 @@
       "'" scope "' expected to be a symbol."))
 
 (lambda assert-seq [v scope]
-  "asserts if 'v' is a symbol."
+  "asserts if 'v' is a list."
   (ass `(vim.tbl_islist ,v)
       "'" scope "' expected to be a sequence."))
+
+(lambda assert-fseq [v scope]
+  "asserts if 'v' is a literal fennel sequence."
+  (ass `(sequence? ,v)
+      "'" scope "' expected to be a fennel sequence created by [] braces."))
 
 (lambda assert-type [t v scope]
   "asserts if 'v' is of type 't'."
@@ -84,6 +89,7 @@
           :list (assert-list val scope)
           :sym  (assert-sym val scope)
           :seq  (assert-seq val scope)
+          :fseq (assert-fseq val scope)
           _     (assert-type x val scope)))))
   :return
   `(do ,(unpack asrt)))
