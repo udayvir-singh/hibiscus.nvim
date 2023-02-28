@@ -44,7 +44,7 @@ end
 bootstrap("https://github.com/udayvir-singh/hibiscus.nvim")
 
 -- for stable version
-bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.4")
+bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.5")
 ```
 
 - Require a macro library at top of your modules:
