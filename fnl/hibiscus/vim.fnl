@@ -262,7 +262,8 @@
 
 (lun color! [name]
   "sets vim colorscheme to 'name'."
-  (exec! `(colorscheme ,(parse-sym name))))
+  (check [:string name])
+  `(vim.cmd ,(.. "colorscheme " name)))
 
 
 ;; -------------------- ;;

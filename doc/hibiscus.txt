@@ -462,7 +462,7 @@ color!                                                                *color!*
 Sets vim colorscheme to {name}.
 
 >fennel
-    (color! desert)
+    (color! :desert)
 <
 
 

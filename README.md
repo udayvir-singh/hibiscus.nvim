@@ -395,7 +395,7 @@ Removes {val} from string-style option {name}.
 Sets vim colorscheme to {name}.
 
 ```fennel
-(color! desert)
+(color! :desert)
 ```
 
 ## variables
