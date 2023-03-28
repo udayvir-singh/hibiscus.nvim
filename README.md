@@ -729,15 +729,15 @@ Prints execution time of {...} in milliseconds.
 ```
 
 > maps values in {tbl} with {handler}.
->
-> {handler} takes in (key, val) and returns a new value.
+> 
+> {handler} takes in (val, key, tbl) as arguments and returns a new value.
 
 ```fennel
 (filter! {list} {handler})
 ```
 
 > filters values in {list} with {handler}.
->
+> 
 > {handler} takes in (val) and returns a boolean.
 
 ```fennel

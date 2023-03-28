@@ -239,9 +239,10 @@
 (lun tmap! [tbl handler]
   "maps values in table with 'handler'."
   `(let [out# {}
+         tbl# ,tbl
          fnc# ,handler]
-     (each [key# val# (pairs ,tbl)]
-       (tset out# key# (fnc# key# val#)))
+     (each [key# val# (pairs tbl#)]
+       (tset out# key# (fnc# val# key# tbl#)))
      :return out#))
 
 (lun filter! [lst handler]

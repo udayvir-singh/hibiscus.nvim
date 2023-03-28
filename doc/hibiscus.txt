@@ -815,15 +815,17 @@ TABLE                                                         *hibiscus-table*
     (tmap! {tbl} {handler})
 <
 
-maps values in {tbl} with {handler}. > {handler} takes in (key, val) and
-returns a new value.
+maps values in {tbl} with {handler}.
+
+{handler} takes in (val, key, tbl) as arguments and returns a new value.
 
 >fennel
     (filter! {list} {handler})
 <
 
-filters values in {list} with {handler}. > {handler} takes in (val) and returns
-a boolean.
+filters values in {list} with {handler}.
+
+{handler} takes in (val) and returns a boolean.
 
 >fennel
     (merge-list! {list1} {list2})
