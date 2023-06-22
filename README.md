@@ -252,9 +252,9 @@ Defines user command {lhs} to {rhs}.
 
 ```fennel
 [
+  :buffer   <number>
   :bar      <boolean>
   :bang     <boolean>
-  :buffer   <boolean>
   :register <boolean>
   :range    (or <boolean> <string>)
   :addr     <string>
@@ -281,7 +281,7 @@ Defines user command {lhs} to {rhs}.
 
 (command! [:nargs 1 :complete #["world"]] :Greet `greet) ; quoting is optional in command! macro
 
-(command! [:bang true] :Lhs #(print $.bang))
+(command! [:buffer 0 :bang true] :Lhs #(print $.bang))
 ```
 
 ## vimscript

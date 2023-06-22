@@ -216,7 +216,12 @@
 (lun command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
   (check [:even (as args (# args))])
-  `(vim.api.nvim_create_user_command ,lhs ,(parse-cmd rhs) ,(parse-command-args args)))
+  (local args (parse-command-args args))
+  (if (= nil args.buffer)
+    `(vim.api.nvim_create_user_command ,lhs ,(parse-cmd rhs) ,args)
+    (let [buffer args.buffer]
+      (set args.buffer nil)
+      `(vim.api.nvim_buf_create_user_command ,buffer ,lhs ,(parse-cmd rhs) ,args))))
 
 
 ;; -------------------- ;;
