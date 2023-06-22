@@ -110,14 +110,25 @@ used `ref` option in bootstrap]:
 <
 
 
+LAZY ~
+
+>fennel
+    (local lazy (require :lazy))
+    
+    (lazy.setup [
+      :udayvir-singh/hibiscus.nvim
+    ])
+<
+
+
 PAQ ~
 
 >fennel
     (local paq (require :paq))
     
-    (paq {
+    (paq [
       :udayvir-singh/hibiscus.nvim
-    })
+    ])
 <
 
 

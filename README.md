@@ -76,14 +76,24 @@ You can use packer to manage hibiscus afterwards [use this if you haven't used `
   (use! :udayvir-singh/hibiscus.nvim))
 ```
 
+### Lazy
+
+```fennel
+(local lazy (require :lazy))
+
+(lazy.setup [
+  :udayvir-singh/hibiscus.nvim
+])
+```
+
 ### Paq
 
 ```fennel
 (local paq (require :paq))
 
-(paq {
+(paq [
   :udayvir-singh/hibiscus.nvim
-})
+])
 ```
 
 # Packer Macros
