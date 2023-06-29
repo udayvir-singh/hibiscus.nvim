@@ -72,7 +72,7 @@ RATIONAL                                                   *hibiscus-rational*
     end
     
     -- for stable version [recommended]
-    bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.5")
+    bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.6")
     
     -- for git head
     bootstrap("https://github.com/udayvir-singh/hibiscus.nvim")
@@ -413,8 +413,9 @@ set!                                                                    *set!*
 Works like command `:set`, sets vim option {name}.
 
 >fennel
-    (set! nobackup)
     (set! tabstop 4)
+    (set! nobackup)
+    (set! wrap!)
     
     (each [_ opt (ipairs ["number" "rnu"])]
           (set! opt true))

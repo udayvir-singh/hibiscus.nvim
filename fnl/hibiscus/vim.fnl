@@ -235,10 +235,14 @@
       (string? name)
       (if (= :no (string.sub name 1 2))
           `(tset ,method ,(string.sub name 3) false)
+          (= :! (string.sub name -1 -1))
+          `(tset ,method ,(string.sub name 1 -2) (not (. vim.o ,(string.sub name 1 -2))))
           `(tset ,method ,name true))
       ; else compute at runtime
       `(if (= :no (string.sub ,name 1 2))
            (tset ,method (string.sub ,name 3) false)
+           (= :! (string.sub ,name -1 -1))
+           (tset ,method (string.sub ,name 1 -2) (not (. vim.o (string.sub ,name 1 -2))))
            (tset ,method ,name true))))
 
 (lun set! [name ?val]

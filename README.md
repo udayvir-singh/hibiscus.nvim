@@ -352,8 +352,9 @@ Useful for breaking down large strings without any overhead.
 Works like command `:set`, sets vim option {name}.
 
 ```fennel
-(set! nobackup)
 (set! tabstop 4)
+(set! nobackup)
+(set! wrap!)
 
 (each [_ opt (ipairs ["number" "rnu"])]
       (set! opt true))
