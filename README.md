@@ -41,7 +41,7 @@ local function bootstrap(url, ref)
 end
 
 -- for stable version [recommended]
-bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.6")
+bootstrap("https://github.com/udayvir-singh/hibiscus.nvim", "v1.7")
 
 -- for git head
 bootstrap("https://github.com/udayvir-singh/hibiscus.nvim")
