@@ -97,7 +97,7 @@
         (list? x)
         (let [name (tostring (table.remove x 1))
               args (parse-exec "," x)]
-          (table.insert out '(.. ,name "(" ,args ")")))
+          (table.insert out `(.. ,name "(" ,args ")")))
         (table.insert out (tostring x))))
   (concat! sep (unpack out)))
 
