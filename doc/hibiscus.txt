@@ -6,6 +6,7 @@ Table of Contents                                 *hibiscus-table-of-contents*
 1. Hibiscus.nvim                                      |hibiscus-hibiscus.nvim|
   - Rational                                               |hibiscus-rational|
 2. Installation                                        |hibiscus-installation|
+  - Package Management                           |hibiscus-package-management|
 3. Packer Macros                                      |hibiscus-packer-macros|
 4. Neovim Macros                                      |hibiscus-neovim-macros|
   - keymaps                                                 |hibiscus-keymaps|
@@ -38,7 +39,9 @@ standalone.
 RATIONAL                                                   *hibiscus-rational*
 
 
-- Syntactic eye candy over hellscape of lua api
+- >
+             Syntactic eye candy over hellscape of lua api
+    <
 - Provides missing features in both fennel and nvim api
 
 
@@ -93,40 +96,48 @@ RATIONAL                                                   *hibiscus-rational*
 
 Now start using these macros in your config
 
-------------------------------------------------------------------------------
 
-PACKER ~
+PACKAGE MANAGEMENT                               *hibiscus-package-management*
 
-You can use packer to manage hibiscus afterwards [use this if you haven’t
-used `ref` option in bootstrap]:
+Only use a package manager if you haven’t used `ref` option in bootstrap
+function.
+
+Packer
+
+>fennel
+    (local packer (require :packer))
+    
+    (packer.startup (lambda [use]
+      (use :udayvir-singh/hibiscus.nvim)))
+<
+
+Using hibiscus <https://github.com/udayvir-singh/hibiscus.nvim> macros:
 
 >fennel
     (require-macros :hibiscus.packer)
     
-    (packer-setup!)
+    (packer-setup {}) ; bootstraps packer
     
-    (packer!
+    (packer
       (use! :udayvir-singh/hibiscus.nvim))
 <
 
-
-LAZY ~
-
->fennel
-    (local lazy (require :lazy))
-    
-    (lazy.setup [
-      :udayvir-singh/hibiscus.nvim
-    ])
-<
-
-
-PAQ ~
+Paq
 
 >fennel
     (local paq (require :paq))
     
     (paq [
+      :udayvir-singh/hibiscus.nvim
+    ])
+<
+
+Lazy
+
+>fennel
+    (local lazy (require :lazy))
+    
+    (lazy.setup [
       :udayvir-singh/hibiscus.nvim
     ])
 <

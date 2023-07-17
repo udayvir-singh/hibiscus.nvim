@@ -10,7 +10,7 @@ but it can also be used standalone.
 
 ## Rational
 
-- :candy: Syntactic eye candy over hellscape of lua api
+- :candy:         Syntactic eye candy over hellscape of lua api
 - :tanabata_tree: Provides missing features in both fennel and nvim api
 
 # Installation
@@ -24,20 +24,20 @@ but it can also be used standalone.
 local pack = "tangerine" or "packer" or "paq"
 
 local function bootstrap(url, ref)
-	local name = url:gsub(".*/", "")
-	local path = vim.fn.stdpath [[data]] .. "/site/pack/".. pack .. "/start/" .. name
+    local name = url:gsub(".*/", "")
+    local path = vim.fn.stdpath [[data]] .. "/site/pack/".. pack .. "/start/" .. name
 
-	if vim.fn.isdirectory(path) == 0 then
-		print(name .. ": installing in data dir...")
+    if vim.fn.isdirectory(path) == 0 then
+        print(name .. ": installing in data dir...")
 
-		vim.fn.system {"git", "clone", url, path}
-		if ref then
-			vim.fn.system {"git", "-C", path, "checkout", ref}
-		end
+        vim.fn.system {"git", "clone", url, path}
+        if ref then
+            vim.fn.system {"git", "-C", path, "checkout", ref}
+        end
 
-		vim.cmd [[redraw]]
-		print(name .. ": finished installing")
-	end
+        vim.cmd [[redraw]]
+        print(name .. ": finished installing")
+    end
 end
 
 -- for stable version [recommended]
@@ -61,22 +61,48 @@ bootstrap("https://github.com/udayvir-singh/hibiscus.nvim")
 
 :tada: Now start using these macros in your config
 
----
+## Package Management
 
-### Packer
+Only use a package manager if you haven't used `ref` option in bootstrap function.
 
-You can use packer to manage hibiscus afterwards [use this if you haven't used `ref` option in bootstrap]:
+<details>
+<summary><b>Packer</b></summary><br>
+
+```fennel
+(local packer (require :packer))
+
+(packer.startup (lambda [use]
+  (use :udayvir-singh/hibiscus.nvim)))
+```
+
+Using [hibiscus](https://github.com/udayvir-singh/hibiscus.nvim) macros:
 
 ```fennel
 (require-macros :hibiscus.packer)
 
-(packer-setup!)
+(packer-setup {}) ; bootstraps packer
 
-(packer!
+(packer
   (use! :udayvir-singh/hibiscus.nvim))
 ```
 
-### Lazy
+</details>
+
+<details>
+<summary><b>Paq</b></summary><br>
+
+```fennel
+(local paq (require :paq))
+
+(paq [
+  :udayvir-singh/hibiscus.nvim
+])
+```
+
+</details>
+
+<details>
+<summary><b>Lazy</b></summary><br>
 
 ```fennel
 (local lazy (require :lazy))
@@ -86,15 +112,7 @@ You can use packer to manage hibiscus afterwards [use this if you haven't used `
 ])
 ```
 
-### Paq
-
-```fennel
-(local paq (require :paq))
-
-(paq [
-  :udayvir-singh/hibiscus.nvim
-])
-```
+</details>
 
 # Packer Macros
 
