@@ -17,15 +17,25 @@ but it can also be used standalone.
 
 - Create file `plugin/0-tangerine.lua` to bootstrap hibiscus:
 
-```lua
--- ~/.config/nvim/plugin/0-tangerine.lua
+> NOTE: if you are using [lazy](https://github.com/folke/lazy.nvim) plugin manager,
+> you should create `/init.lua` instead.
 
--- pick your plugin manager, default [standalone]
-local pack = "tangerine" or "packer" or "paq"
+```lua
+-- ~/.config/nvim/plugin/0-tangerine.lua or ~/.config/nvim/init.lua
+
+-- pick your plugin manager
+local pack = "tangerine" or "packer" or "paq" or "lazy"
 
 local function bootstrap(url, ref)
     local name = url:gsub(".*/", "")
-    local path = vim.fn.stdpath [[data]] .. "/site/pack/".. pack .. "/start/" .. name
+    local path
+
+    if pack == "lazy" then
+        path = vim.fn.stdpath("data") .. "/lazy/" .. name
+        vim.opt.rtp:prepend(path)
+    else
+        path = vim.fn.stdpath("data") .. "/site/pack/".. pack .. "/start/" .. name
+    end
 
     if vim.fn.isdirectory(path) == 0 then
         print(name .. ": installing in data dir...")
@@ -35,7 +45,7 @@ local function bootstrap(url, ref)
             vim.fn.system {"git", "-C", path, "checkout", ref}
         end
 
-        vim.cmd [[redraw]]
+        vim.cmd "redraw"
         print(name .. ": finished installing")
     end
 end
