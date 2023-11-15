@@ -9,7 +9,7 @@
 (lambda func? [x]
   "checks if 'x' is function definition."
   (let [ref (?. x 1 1)]
-    (or= ref :fn :hashfn :lambda :partial)))
+    (or= ref :λ :fn :hashfn :lambda :partial)))
 
 (lambda quote? [x]
   "checks if 'x' is quoted value."
