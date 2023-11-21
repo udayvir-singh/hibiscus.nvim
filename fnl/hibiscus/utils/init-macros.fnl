@@ -67,10 +67,10 @@
       "'" scope "' expected to be of type " t "."))
 
 (lambda M.check [c]
-  (assert-compile (= 0 (% (# c) 2))
+  (assert-compile (= 0 (% (length c) 2))
     "  hibiscus: check: expected even number of arguments.")
   (local asrt [])
-  (for [i 1 (# c) 2]
+  (for [i 1 (length c) 2]
     (let [x (. c i)
           y (. c (+ 1 i))]
       ; parse first argument

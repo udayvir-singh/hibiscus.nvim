@@ -63,7 +63,7 @@
         (each [_ v* (ipairs (do (table.remove v 1) v))]
           (table.insert stack v*))
         (table.insert stack v))
-    (if (< i (# vargs))
+    (if (< i (length vargs))
         (table.insert stack sep)))
   ; generate body
   (local out [])
@@ -79,7 +79,7 @@
             (table.insert out v))))
   (push-cur)
   :return
-  (if (= (# out) 1)
+  (if (= (length out) 1)
       (unpack out)
       (list `.. (unpack out))))
 
@@ -215,7 +215,7 @@
 
 (lun command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
-  (check [:even (as args (# args))])
+  (check [:even (as args (length args))])
   (local args (parse-command-args args))
   (if (= nil args.buffer)
     `(vim.api.nvim_create_user_command ,lhs ,(parse-cmd rhs) ,args)

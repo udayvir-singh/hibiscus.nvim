@@ -58,7 +58,7 @@
     (check [:seq (as require out.require)])
     ; create config handler
     (local handler
-      (if (= 1 (# out.require))
+      (if (= 1 (length out.require))
           `(require ,(. out.require 1))
           `(each [# x# (ipairs ,out.require)] (require x#))))
     (set out.config
@@ -78,7 +78,7 @@
 (lun use! [name ...]
   "syntactic sugar over packer's use function."
   (check [:string name
-          :even   (as options (# [...]))])
+          :even   (as options (length [...]))])
   :return
   `(use ,(parse-conf name [...])))
 
