@@ -74,12 +74,9 @@
     (let [x (. c i)
           y (. c (+ 1 i))]
       ; parse first argument
-      (var val  nil)
-      (var name nil)
-      (if (= :as (?. y 1 1))
-          (do (set name (. y 2))
-              (set val (. y 3)))
-          (set val y))
+      (local [name val] (if (= :as (?. y 1 1))
+                            [(. y 2) (. y 3)]
+                            [nil y]))
       ; add assertion
       (local scope (if name (tostring name) (tostring val)))
       (table.insert asrt
