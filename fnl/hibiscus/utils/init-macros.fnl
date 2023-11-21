@@ -88,8 +88,8 @@
           :seq  (assert-seq val scope)
           :fseq (assert-fseq val scope)
           _     (assert-type x val scope)))))
-  :return
+
   `(do ,(unpack asrt)))
 
 
-:return M
+M

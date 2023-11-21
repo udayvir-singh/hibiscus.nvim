@@ -46,7 +46,7 @@
     (tset lst idx nil))
   (each [_ val (pairs lst)]
     (table.insert out val))
-  :return out)
+  out)
 
 
 ;; -------------------- ;;
@@ -78,7 +78,7 @@
         (do (push-cur)
             (table.insert out v))))
   (push-cur)
-  :return
+
   (if (= (length out) 1)
       (unpack out)
       (list `.. (unpack out))))
@@ -128,7 +128,7 @@
       (if (= key :verbose)
           (tset opts :silent false)
           (tset opts key true)))
-    :return
+
     (values modes opts)))
 
 (lun map! [args lhs rhs ?desc]
@@ -138,7 +138,7 @@
           :string (as description (or ?desc ""))])
   (local (modes opts) (parse-map-args args))
   (set opts.desc ?desc)
-  :return
+
   `(vim.keymap.set ,modes ,lhs ,(parse-cmd rhs) ,opts))
 
 
@@ -181,7 +181,7 @@
       (table.insert rem i)
       (table.insert rem (inc! i))))
   (local events (parse-list (list-remove events rem)))
-  :return
+
   `(vim.api.nvim_create_autocmd ,events ,opts))
 
 (lun augroup! [name ...]
@@ -198,7 +198,7 @@
             :real (as pattern (. au 2))
             :real (as command (. au 3))])
     (table.insert out (autocmd id au)))
-  :return
+
   (dolist out))
 
 
@@ -211,7 +211,7 @@
   (each [idx val (ipairs args)]
     (if (odd? idx)
         (tset out val (. args (inc! idx)))))
-  :return out)
+  out)
 
 (lun command! [args lhs rhs]
   "defines a user command from 'lhs' and 'rhs'."
@@ -287,4 +287,4 @@
   `(tset vim.b ,(parse-sym name) ,val))
 
 
-:return M
+M

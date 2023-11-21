@@ -73,14 +73,14 @@
           (table.insert out.requires (parse-conf (table.remove dep 1) dep))
           (table.insert out.requires dep)))
     (set out.depends nil))
-  :return out)
+  out)
 
 (lun use! [name ...]
   "syntactic sugar over packer's use function."
   (check [:string name
           :even   (as options (length [...]))])
-  :return
+
   `(use ,(parse-conf name [...])))
 
 
-:return M
+M
