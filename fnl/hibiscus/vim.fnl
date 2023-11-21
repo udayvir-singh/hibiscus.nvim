@@ -37,7 +37,7 @@
   (if (quote? xs)
       (let [ref (. xs 2)]
         (if (list? ref) `(fn [] ,ref) ref))
-      :else xs))
+      xs))
 
 (lambda list-remove [lst idxs]
   "remove values on 'idxs' from 'lst'."
