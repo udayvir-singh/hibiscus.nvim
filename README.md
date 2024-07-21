@@ -17,8 +17,15 @@ but it can also be used standalone.
 
 - Create file `plugin/0-tangerine.lua` to bootstrap hibiscus:
 
-> NOTE: if you are using [lazy](https://github.com/folke/lazy.nvim) plugin manager,
-> you should create `/init.lua` instead.
+> [!IMPORTANT]
+>
+> - If you are using [lazy](https://github.com/folke/lazy.nvim) plugin manager,
+>   you should create `/init.lua` instead.
+>
+> - If you are using [rocks.nvim](https://github.com/nvim-neorocks/rocks.nvim),
+>   there is no need to bootstrap this plugin
+>   (unless you want to write your rocks.nvim bootstrap script in Fennel).
+>   Install with `:Rocks install hibiscus.nvim`.
 
 ```lua
 -- ~/.config/nvim/plugin/0-tangerine.lua or ~/.config/nvim/init.lua
